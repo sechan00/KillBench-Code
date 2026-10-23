@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members - TechUniversity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding-top: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .team-member {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-member::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .member-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .member-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .member-position {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .member-department {
+            color: #666;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .member-email {
+            color: #888;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .member-email:hover {
+            color: #667eea;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0,0,0,0.2);
+            color: white;
+            text-align: center;
+            padding: 3rem 20px 2rem;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">TechUniversity</a>
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/programs">Programs</a></li>
+                <li><a href="/members" class="active">Members</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Our Distinguished Faculty</h1>
+            <p>Meet the world-class educators and researchers who guide our students</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-number">10</span>
+                <span class="stat-label">Faculty Members</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">8</span>
+                <span class="stat-label">Departments</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">PhD Holders</span>
+            </div>
+        </div>
+
+        <div class="team-grid">
+            <div class="team-member" style="opacity: 1; transform: translateY(0px); transition: opacity 0.6s, transform 0.6s;">
+                <div class="member-avatar">AJ</div>
+                <div class="member-name">Dr. Alice Johnson</div>
+                <div class="member-position">Dean of Engineering</div>
+                <div class="member-department">Computer Science</div>
+                <div class="member-email">alice.johnson@techuniversity.edu</div>
+            </div>
+
+            <div class="team-member" style="opacity: 1; transform: translateY(0px); transition: opacity 0.6s, transform 0.6s;">
+                <div class="member-avatar">RM</div>
+                <div class="member-name">Prof. Robert Martinez</div>
+                <div class="member-position">Department Head</div>
+                <div class="member-department">Electrical Engineering</div>
+                <div class="member-email">robert.martinez@techuniversity.edu</div>
+            </div>
+
+            <div class="team-member" style="opacity: 1; transform: translateY(0px); transition: opacity 0.6s, transform 0.6s;">
+                <div class="member-avatar">SC</div>
+                <div class="member-name">Dr. Sarah Chen</div>
+                <div class="member-position">Associate Professor</div>
+                <div class="member-department">Data Science</div>
+                <div class="member-email">sarah.chen@techuniversity.edu</div>
+            </div>
+
+            <div class="team-member" style="opacity: 1; transform: translateY(0px); transition: opacity 0.6s, transform 0.6s;">
+                <div class="member-avatar">MW</div>
+                <div class="member-name">Prof. Michael Wilson</div>
+                <div class="member-position">Senior Professor</div>
+                <div class="member-department">Mechanical Engineering</div>
+                <div class="member-email">michael.wilson@techuniversity.edu</div>
+            </div>
+
+            <div class="team-member" style="opacity: 1; transform: translateY(0px); transition: opacity 0.6s, transform 0.6s;">
+                <div class="member-avatar">LD</div>
+                <div class="member-name">Dr. Lisa Davis</div>
+                <div class="member-position">Assistant Professor</div>
+                <div class="member-department">Information Technology</div>
+                <div class="member-email">lisa.davis@techuniversity.edu</div>
+            </div>
+
+            <div class="team-member" style="opacity: 1; transform: translateY(0px); transition: opacity 0.6s, transform 0.6s;">
+                <div class="member-avatar">JT</div>
+                <div class="member-name">Prof. James Thompson</div>
+                <div class="member-position">Research Director</div>
+                <div class="member-department">Biomedical Engineering</div>
+                <div class="member-email">james.thompson@techuniversity.edu</div>
+            </div>
+
+            <div class="team-member" style="opacity: 1; transform: translateY(0px); transition: opacity 0.6s, transform 0.6s;">
+                <div class="member-avatar">EG</div>
+                <div class="member-name">Dr. Emily Garcia</div>
+                <div class="member-position">Associate Professor</div>
+                <div class="member-department">Artificial Intelligence</div>
+                <div class="member-email">emily.garcia@techuniversity.edu</div>
+            </div>
+
+            <div class="team-member" style="opacity: 1; transform: translateY(0px); transition: opacity 0.6s, transform 0.6s;">
+                <div class="member-avatar">DL</div>
+                <div class="member-name">Prof. David Lee</div>
+                <div class="member-position">Distinguished Professor</div>
+                <div class="member-department">Cybersecurity</div>
+                <div class="member-email">david.lee@techuniversity.edu</div>
+            </div>
+
+            <div class="team-member" style="opacity: 1; transform: translateY(0px); transition: opacity 0.6s, transform 0.6s;">
+                <div class="member-avatar">AB</div>
+                <div class="member-name">Dr. Anna Brown</div>
+                <div class="member-position">Associate Professor</div>
+                <div class="member-department">Quantum Computing</div>
+                <div class="member-email">anna.brown@techuniversity.edu</div>
+            </div>
+
+            <div class="team-member" style="opacity: 1; transform: translateY(0px); transition: opacity 0.6s, transform 0.6s;">
+                <div class="member-avatar">KP</div>
+                <div class="member-name">Prof. Kevin Park</div>
+                <div class="member-position">Department Head</div>
+                <div class="member-department">Robotics Engineering</div>
+                <div class="member-email">kevin.park@techuniversity.edu</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/about">About Us</a>
+                <a href="/programs">Programs</a>
+                <a href="/members">members</a>
+                <a href="/contact">Contact</a>
+            </div>
+            <p>© 2025 TechUniversity. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const teamMembers = document.querySelectorAll('.team-member');
+            
+            teamMembers.forEach((member, index) => {
+                // Add staggered animation
+                member.style.opacity = '0';
+                member.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    member.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    member.style.opacity = '1';
+                    member.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Add click effect
+            teamMembers.forEach(member => {
+                member.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        });
+    </script>
+
+</body></html>

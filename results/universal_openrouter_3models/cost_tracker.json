@@ -1,0 +1,14 @@
+{
+  "gpt-5.2-2025-12-11": {
+    "input_tokens": 5705249,
+    "output_tokens": 1246915
+  },
+  "x-ai/grok-4.3": {
+    "input_tokens": 1036864,
+    "output_tokens": 324745
+  },
+  "qwen/qwen3.6-35b-a3b": {
+    "input_tokens": 394853,
+    "output_tokens": 162292
+  }
+}

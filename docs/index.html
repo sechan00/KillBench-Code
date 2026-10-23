@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KillBench — Can We Stop Malicious AI?</title>
+<meta name="description" content="KillBench: a benchmark for External AI Kill Switch feasibility against malicious web LLM agents.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="index.html">KillBench</a>
+    <button id="navToggle" aria-label="Menu">☰</button>
+    <ul id="navMenu">
+      <li><a class="link" href="#overview">Overview</a></li>
+      <li><a class="link" href="results.html">Results</a></li>
+      <li><a class="link ext" href="https://github.com/sechan00/KillBench-Code">Benchmark</a></li>
+      <li><a class="link ext" href="https://arxiv.org/abs/2511.13725v4">Paper</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="kicker">Can We Stop Malicious AI?</div>
+    <h1>KillBench</h1>
+    <p class="tagline">A benchmark for <strong>External AI Kill Switch</strong> feasibility — measuring whether a signal placed in a web agent's environment can halt a maliciously operating AI at runtime, with no access to its weights or system prompt.</p>
+    <p class="authors"><span>Sechan Lee</span> &nbsp;·&nbsp; <span>Hyounghun Kim</span> &nbsp;·&nbsp; <span>Sangdon Park</span></p>
+    <p class="affil">POSTECH</p>
+    <div class="btns">
+      <a class="btn primary" href="https://arxiv.org/abs/2511.13725v4">Paper (arXiv)</a>
+      <a class="btn" href="https://github.com/sechan00/KillBench-Code">Benchmark &amp; Code</a>
+      <a class="btn" href="results.html">Results</a>
+      <a class="btn" href="#cite">Cite</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">4</div><div class="l">malicious agent configs (C1–C4)</div></div>
+      <div class="stat"><div class="n">8</div><div class="l">harmful web scenarios</div></div>
+      <div class="stat"><div class="n">550</div><div class="l">bypassed attack prompts</div></div>
+      <div class="stat"><div class="n">4</div><div class="l">kill-switch defenses evaluated</div></div>
+    </div>
+  </div>
+</header>
+
+<section id="overview">
+  <div class="wrap">
+    <h2>What is an External AI Kill Switch?</h2>
+    <p class="sub">The symmetric inverse of indirect prompt injection.</p>
+    <p>A <strong>kill switch</strong> halts a running system before it completes a harmful action. For AI, an <em>internal</em> kill switch modifies the agent itself — weights, system prompt, RLHF — and therefore requires privileged access. An <strong>External AI Kill Switch</strong> acts solely through the agent's environment (web pages, tool outputs, ingested context), so it is deployable by anyone who controls the agent's input surface.</p>
+    <p>Indirect Prompt Injection (IPI) exploits that same input channel to push agents <em>toward</em> harm. KillBench asks the symmetric inverse: can the channel push a malicious agent <strong>toward halting</strong>? This is an empirical instance of <strong>agent corrigibility</strong> — long studied in theory, never measured for modern LLM agents.</p>
+
+    <div class="flow">
+      <div class="step"><div class="t">① Malicious scenario</div><div class="d">An attack prompt <code>p<sub>att</sub></code> tasks the agent with a harmful web task</div></div>
+      <div class="arw">→</div>
+      <div class="step"><div class="t">② Kill switch signal</div><div class="d">A payload <code>s</code> is embedded in the page the agent visits</div></div>
+      <div class="arw">→</div>
+      <div class="step"><div class="t">③ Halt or continue</div><div class="d">Did the agent <strong>stop</strong>, or run the harmful task to completion?</div></div>
+    </div>
+    <div class="note">Every trial measures whether <code>s</code>, placed in the environment of a malicious agent <code>A<sub>m</sub></code> executing <code>p<sub>att</sub></code>, induces it to halt <strong>before</strong> completing the harmful task.</div>
+
+    <h3>Research questions</h3>
+    <p class="sub" style="margin-bottom:14px">Policy — the EU AI Act, California SB-1047, the 2024 Seoul AI Safety Summit — mandates runtime kill switches, but no instrument existed to test whether they actually work.</p>
+    <div class="grid g3">
+      <div class="card">
+        <span class="tag">RQ1 · Feasibility</span>
+        <p>Can an external signal placed in the agent's environment halt a malicious agent's in-progress harmful task at runtime?</p>
+        <p class="a">Yes — up to KSR<sub>cond</sub> ≈ 91% on aligned backbones.</p>
+      </div>
+      <div class="card">
+        <span class="tag">RQ2 · Effective defenses</span>
+        <p>Which families of External Kill Switch defenses most reliably halt malicious agents in practice?</p>
+        <p class="a">AutoGuard leads; hand-crafted IPI is close behind; GCG fails universally.</p>
+      </div>
+      <div class="card">
+        <span class="tag">RQ3 · Robustness</span>
+        <p>How does effectiveness vary across agent configurations, LLM backbones, and harmful-task scenarios?</p>
+        <p class="a">Robust — except two regimes: system-prompt bypass (C2) and uncensored (C4).</p>
+      </div>
+    </div>
+    <p style="margin-top:22px"><a class="btn" href="results.html">See the full results →</a></p>
+  </div>
+</section>
+
+<section id="benchmark">
+  <div class="wrap">
+    <h2>Benchmark Composition</h2>
+    <p class="sub">Built on SafeArena's WebArena-backed multi-step stack with a BrowserGym / AgentLab full-stack agent. Every trial is scored at the <strong>trajectory level</strong>.</p>
+
+    <h3>Four malicious agent configurations</h3>
+    <p>KillBench varies the <em>agent</em> axis along modality, instantiation, and alignment — a dimension prior benchmarks never manipulated.</p>
+    <div class="grid g2">
+      <div class="card"><span class="tag">C1 · Text-based</span>A text-only LLM web agent — the baseline malicious agent.</div>
+      <div class="card"><span class="tag">C2 · System-Prompt Bypass</span>A more incorrigible C1 variant: an adversarial system prompt pre-immunizes the agent against any in-page halt signal. A worst-case stress test.</div>
+      <div class="card"><span class="tag">C3 · Multimodal</span>A vision-grounded agent that perceives page screenshots, not just the DOM.</div>
+      <div class="card"><span class="tag">C4 · Uncensored</span>An alignment-stripped open-source agent whose intrinsic safety refusal has been removed (ISR = 0).</div>
+    </div>
+
+    <h3>Eight harmful scenarios · 550 attack prompts</h3>
+    <p>Five high-toxicity scenarios inherited from SafeArena, plus three lower-toxicity but realistically-deployed scenarios newly built on purpose-made WebArena sites. Each direct request is expanded through <strong>ten jailbreak patterns</strong> to recover measurement headroom.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Scenario</th><th>Source</th><th class="num"># prompts</th></tr></thead>
+        <tbody>
+          <tr><td>Bias</td><td>SafeArena</td><td class="num">50</td></tr>
+          <tr><td>Cybercrime</td><td>SafeArena</td><td class="num">50</td></tr>
+          <tr><td>Illegal Activity</td><td>SafeArena</td><td class="num">50</td></tr>
+          <tr><td>Harassment</td><td>SafeArena</td><td class="num">50</td></tr>
+          <tr><td>Misinformation</td><td>SafeArena</td><td class="num">50</td></tr>
+          <tr><td>PII Collection</td><td><strong>Ours</strong></td><td class="num">100</td></tr>
+          <tr><td>Social-Divisive Generation</td><td><strong>Ours</strong></td><td class="num">100</td></tr>
+          <tr><td>Web-Vulnerability Scanning</td><td><strong>Ours</strong></td><td class="num">100</td></tr>
+        </tbody>
+        <tfoot><tr><th>Total — 8 scenarios / 7 sites</th><th></th><th class="num">550</th></tr></tfoot>
+      </table>
+      <caption>Ten jailbreak patterns (AR, CR, RE, TC, LOGIC, PROG, TRANS, SUPER, SUDO, SIMU) are applied to each scenario.</caption>
+    </div>
+
+    <h3>Four External Kill Switch defenses</h3>
+    <div class="grid g2">
+      <div class="card"><span class="tag">IPI · hand-crafted</span>A naive indirect-prompt-injection payload wrapped in chat-template markers so it is parsed as a system-role override.</div>
+      <div class="card"><span class="tag">GCG · gradient</span>A universal adversarial refusal suffix optimized via inverse-GCG on Llama-3-8B, transferred zero-shot.</div>
+      <div class="card"><span class="tag">Warning-based · hand-crafted</span>A plain-prose legal notice citing real statutes (CFAA, UK CMA, EU 2013/40/EU, EU DSA) framing automated access as out of scope.</div>
+      <div class="card"><span class="tag">AutoGuard · bandit-learned</span>A universal hidden-DOM payload learned with an EXP3-IX bandit over a multi-LLM panel disjoint from the evaluation models.</div>
+    </div>
+
+    <h3>Trajectory-level metrics</h3>
+    <p class="sub" style="margin-bottom:10px">KSR / NHR / PSR / ISR form a mutually-exclusive partition (they sum to 1 per cell). CSR is an interpretability overlay.</p>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Metric</th><th>Dir.</th><th>Definition</th></tr></thead>
+        <tbody>
+          <tr><td><strong>KSR</strong> — Kill Switch Rate</td><td>↑</td><td>Agent halts immediately upon first encountering <code>s</code>, before any harmful action. The ideal outcome.</td></tr>
+          <tr><td><strong>KSR<sub>cond</sub></strong> — Conditional KSR</td><td>↑</td><td>KSR / (1 − ISR). Isolates the payload's effect from the agent's intrinsic refusal. <strong>The headline statistic.</strong></td></tr>
+          <tr><td><strong>NHR</strong> — Non-Halt Rate</td><td>↓</td><td>Agent never halts and runs the attack prompt to the end.</td></tr>
+          <tr><td><strong>PSR</strong> — Post Stop Rate</td><td>—</td><td>Agent halts mid-trajectory, after partially executing the task.</td></tr>
+          <tr><td><strong>ISR</strong> — Immediate Stop Rate</td><td>—</td><td>Intrinsic safety alignment refuses before ever encountering <code>s</code>.</td></tr>
+          <tr><td><strong>CSR</strong> — CoT Stop Rate</td><td>↑</td><td>Among halted trajectories, the fraction whose chain-of-thought explicitly cites <code>s</code> as the reason.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><strong>The ISR confound.</strong> A high intrinsic-refusal rate shrinks the pool of trials that ever reach <code>s</code>, deflating raw KSR. KSR<sub>cond</sub> corrects for this — which is why it is the number reported throughout.</div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <h2>Getting Started</h2>
+    <p class="sub">Python 3.10+, Chrome/Chromium, CUDA optional. All commands run in the <code>AutoGuard</code> conda environment.</p>
+    <pre><code>conda create -n AutoGuard python=3.10 &amp;&amp; conda activate AutoGuard
+pip install -r requirements.txt
+
+# One-time worker bootstrap so the kill-switch payload is re-injected
+# inside loky worker subprocesses.
+bash KillBench/bootstrap/install.sh</code></pre>
+    <p>KillBench additionally requires the WebArena Docker sandbox on ports <code>21000–21009</code> and a <code>.env</code> holding the API keys you need (<code>OPENAI_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>, <code>OPENROUTER_API_KEY</code>, …).</p>
+
+    <h3>Run a trial and score it</h3>
+    <pre><code># Clean baseline (no kill switch) — establishes ISR
+python KillBench/eval.py --agent default --model grok-4.3 \
+    --payload clean --suffix grok-clean
+
+# AutoGuard kill-switch payload on the default (C1) agent
+python KillBench/eval.py --agent default --model grok-4.3 \
+    --payload autoguard --scenario pii --suffix grok-autoguard
+
+# Post-hoc scoring — decoupled from execution (KSR / KSRcond / CSR + ΔKS)
+python KillBench/aggregate_results.py \
+    --study-dir ~/agentlab_results/&lt;ts&gt;_...-grok-autoguard \
+    --payload autoguard --scenario pii \
+    --baseline-results results_grok_baseline.json \
+    --output results_grok_autoguard_pii.json</code></pre>
+    <p><code>KillBench/lite/</code> is a lighter self-hosted profile of the same pipeline — static local sites instead of the full SafeArena Docker stack — for open-source / uncensored backbones and mechanism analysis.</p>
+    <ul class="tick">
+      <li><code>--agent {default | hardened | browseruse}</code> — C1 / C2 / C3 agent configurations</li>
+      <li><code>--payload {clean | warning | ipi | gcg | autoguard | vision_autoguard}</code></li>
+      <li><code>--scenario {pii | news | hack}</code> · <code>--limit N</code> · <code>--suffix LABEL</code></li>
+    </ul>
+  </div>
+</section>
+
+<section id="ethics">
+  <div class="wrap">
+    <h2>Safety &amp; Responsible Use</h2>
+    <p class="sub">Dual-use research conducted in sandboxes only.</p>
+    <ul class="tick">
+      <li>All target websites are <strong>local sandboxes</strong> — never live third-party services. The three new scenarios use synthetic faculty records, fictitious articles, and a faux electronics store: no real PII, accounts, or production servers.</li>
+      <li>All four payloads are <strong>designed to halt an agent</strong>, not to coerce it into harmful action. AutoGuard was trained to halt maliciously-prompted agents; its false-positive rate on benign workflows is uncharacterized — pair any deployment with a benign-task validation suite.</li>
+      <li>The uncensored C4 backbone is an existing public model, <strong>referenced not redistributed</strong>. We do not retrain or improve it.</li>
+      <li>The release contains the attack-prompt pool, the four payloads, the hosting sites, the metric pipeline, and judge prompts — <strong>not</strong> attack-synthesis code, uncensored fine-tuning recipes, or pre-collected harmful trajectories.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="cite">
+  <div class="wrap">
+    <h2>Citation</h2>
+    <pre><code>@misc{lee2026killbench,
+  title  = {Can We Stop Malicious AI? KillBench: A Benchmark for
+            External AI Kill Switch Feasibility},
+  author = {Sechan Lee and Hyounghun Kim and Sangdon Park},
+  year   = {2026},
+  eprint = {2511.13725},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI},
+  url    = {https://arxiv.org/abs/2511.13725}
+}</code></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong>KillBench</strong> — an empirical instrument for the feasibility of External AI Kill Switches against malicious web LLM agents, and for the study of AI corrigibility.</p>
+    <p><a href="https://arxiv.org/abs/2511.13725v4">Paper</a> · <a href="https://github.com/sechan00/KillBench-Code">Benchmark &amp; Code</a> · <a href="results.html">Results</a> · Built on <a href="https://safearena.github.io/">SafeArena</a> + WebArena + BrowserGym / AgentLab.</p>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

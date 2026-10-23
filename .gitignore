@@ -1,0 +1,102 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets.*
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+log/
+nohup.out
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data files (if sensitive)
+# Uncomment if you want to ignore data files
+# data/
+
+# Results (if large or sensitive)
+results/attackprompt
+
+*.out
+results/previous/
+openclaw/
+# Chrome driver binaries
+Google_chrome/
+*.deb
+*.zip
+.claude/
+.env
+env
+
+AgentHarm/
+Mind2Web/
+benchmark/
+strix/
+results/
+
+# KillBench trajectory pickles (4GB+; agentlab Study outputs)
+KillBench/results/
+
+test_wrapper.py
+test_benign_prompt.py
+
+# Vendored upstream (clone separately from browser-use/browser-use)
+framework/Agents/browser-use/
+models/
+
+# KillBench runlogs and experimental study outputs
+KillBench/runlogs/
+KillBench/openclaw_study_*/
+
+# Chrome profile artifacts accidentally captured in preview runs
+**/.chrome_profile/
+
+# Backup files and run markers
+*.bak_*
+results/.metrics_*.done
+KillBench/lite/results
+
+# Runtime logs (large, regenerated per run)
+logs/
+previous_results/
+
+# Regenerate raw transcripts and human-label exports locally.
+/data/results/
+/src/eval/judge_validation/data/

@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KillSwitch Bench — SafeArena Version</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="safearena_data.js"></script>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --surface-2: #f0f2f8;
+      --border: #e2e5ee;
+      --text: #1f2330;
+      --text-muted: #5b6270;
+      --primary: #7c3aed;
+      --primary-soft: #ede9fe;
+      --accent-dsr: #2d8a55;
+      --accent-asr: #d6435a;
+      --accent-tcr: #1d6fbf;
+      --accent-aria: #c47d00;
+      --shadow: 0 1px 3px rgba(20, 28, 60, 0.06), 0 4px 12px rgba(20, 28, 60, 0.04);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+        Arial, "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header.site-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .site-header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .brand { font-weight: 700; font-size: 16px; letter-spacing: -0.01em; color: var(--text); }
+    .brand .dot { color: var(--primary); }
+    .brand-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .back-link { font-size: 13px; color: var(--text-muted); margin-left: auto; }
+    nav.breadcrumb {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+    nav.breadcrumb .sep { opacity: 0.5; }
+    nav.breadcrumb a { color: var(--text-muted); }
+    nav.breadcrumb a:hover { color: var(--primary); text-decoration: none; }
+    nav.breadcrumb .current { color: var(--text); font-weight: 600; }
+
+    main.app {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 36px 28px 80px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);
+      border: 1px solid #d8b4fe;
+      border-radius: 16px;
+      padding: 36px 36px 32px;
+      margin-bottom: 28px;
+    }
+    .hero h1 { margin: 0 0 6px; font-size: 30px; letter-spacing: -0.02em; }
+    .hero .subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 18px; }
+    .hero p { margin: 0 0 12px; max-width: 820px; }
+    .rq-list { margin: 14px 0 0; padding-left: 0; list-style: none; }
+    .rq-list li {
+      padding: 6px 12px;
+      background: rgba(124, 58, 237, 0.08);
+      border-left: 3px solid var(--primary);
+      border-radius: 4px;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .metrics-legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .metric-item {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid #d8b4fe;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .metric-item .metric-name {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .metric-item .metric-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+    .mn-asr { color: var(--accent-asr); }
+    .mn-dsr { color: var(--accent-dsr); }
+    .mn-tcr { color: var(--accent-tcr); }
+    .mn-ks { color: var(--primary); }
+    .mn-aria { color: var(--accent-aria); }
+    .mn-hq  { color: #475569; }
+    .mn-tar { color: #0891b2; }
+
+    h2.section-title { margin: 28px 0 16px; font-size: 20px; letter-spacing: -0.01em; }
+    .lead { color: var(--text-muted); font-size: 14.5px; margin: -8px 0 18px; }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.12);
+    }
+    .card .card-tag {
+      align-self: flex-start;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .card .card-tag.tag-text { background: #e0f2fe; color: #0369a1; }
+    .card .card-tag.tag-vision { background: #fef3c7; color: #92400e; }
+    .card .card-tag.tag-openclaw { background: #fce7f3; color: #9d174d; }
+    .card .card-tag.tag-scenario { background: var(--primary-soft); color: var(--primary); }
+
+    .card h3 { margin: 0 0 8px; font-size: 18px; letter-spacing: -0.01em; }
+    .card p { margin: 0; color: var(--text-muted); font-size: 14px; flex-grow: 1; }
+    .card .card-footer { margin-top: 14px; font-size: 13px; color: var(--primary); font-weight: 600; }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+    }
+    .panel h3 { margin: 0 0 10px; font-size: 17px; letter-spacing: -0.01em; }
+    .panel p { margin: 0 0 8px; color: var(--text-muted); font-size: 14.5px; }
+    .panel .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .chart-wrap { position: relative; width: 100%; height: 360px; }
+    .chart-wrap.tall { height: 420px; }
+
+    table.results {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    table.results th, table.results td {
+      padding: 10px 12px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+    }
+    table.results th:first-child, table.results td:first-child { text-align: left; }
+    table.results th {
+      background: var(--surface-2);
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    table.results tr.clickable { cursor: pointer; }
+    table.results tr.clickable:hover { background: var(--primary-soft); }
+    table.results .col-group { border-left: 1px solid var(--border); }
+    table.results .num { font-variant-numeric: tabular-nums; }
+    table.results .num.dsr { color: var(--accent-dsr); font-weight: 600; }
+    table.results .num.asr { color: var(--accent-asr); font-weight: 600; }
+    table.results .num.tcr { color: var(--accent-tcr); font-weight: 600; }
+    table.results .num.aria { color: var(--accent-aria); font-weight: 600; }
+
+    .metric-toggle {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .metric-toggle button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13.5px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.12s ease;
+    }
+    .metric-toggle button:hover { border-color: var(--primary); color: var(--primary); }
+    .metric-toggle button.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .no-data-badge {
+      display: inline-block;
+      background: var(--surface-2);
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-state h2 { color: var(--text); margin-bottom: 8px; }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin: 14px 0 0;
+    }
+    .stat {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .stat .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 4px; }
+    .stat .value { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+    .stat .value.dsr { color: var(--accent-dsr); }
+    .stat .value.asr { color: var(--accent-asr); }
+    .stat .value.tcr { color: var(--accent-tcr); }
+    .stat .value.aria { color: var(--accent-aria); }
+    .stat .value.pending { color: var(--text-muted); font-size: 16px; }
+
+    .pending-banner {
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 14px;
+      color: #78350f;
+      margin-bottom: 20px;
+    }
+    .pending-banner strong { color: #92400e; }
+
+    footer.site-footer {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 30px 28px 50px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <div class="brand">Kill Switch <span class="dot">·</span> Benchmark <span class="brand-badge">SafeArena</span></div>
+      <nav class="breadcrumb" id="breadcrumb"></nav>
+      <a class="back-link" href="index.html">← All Versions</a>
+    </div>
+  </header>
+
+  <main class="app" id="app">
+    <div class="empty-state"><h2>Loading…</h2><p>Reading SafeArena benchmark data</p></div>
+  </main>
+
+  <footer class="site-footer">
+    KillSwitch Bench · SafeArena Version · TrustML Lab ·
+    Populate <code>safearena_data.js</code> with experiment results to enable charts.
+  </footer>
+
+  <script>
+    // ---------- Router ----------
+    const routes = [
+      { pattern: /^\/?$/, handler: () => renderHome() },
+      { pattern: /^\/scenario\/([^/]+)\/?$/, handler: (m) => renderScenario(decodeURIComponent(m[1])) },
+      { pattern: /^\/scenario\/([^/]+)\/agent\/([^/]+)\/?$/, handler: (m) => renderAgent(decodeURIComponent(m[1]), decodeURIComponent(m[2])) },
+      { pattern: /^\/scenario\/([^/]+)\/agent\/([^/]+)\/model\/([^/]+)\/?$/, handler: (m) => renderModel(decodeURIComponent(m[1]), decodeURIComponent(m[2]), decodeURIComponent(m[3])) },
+    ];
+
+    function currentPath() {
+      return (window.location.hash || "#/").replace(/^#/, "");
+    }
+    function navigate(path) { window.location.hash = "#" + path; }
+    function dispatch() {
+      const path = currentPath();
+      for (const r of routes) {
+        const m = path.match(r.pattern);
+        if (m) { destroyAllCharts(); r.handler(m); return; }
+      }
+      renderNotFound(path);
+    }
+    window.addEventListener("hashchange", dispatch);
+
+    // ---------- Data ----------
+    let DATA = null;
+
+    function loadData() {
+      if (window.__SAFEARENA_DATA__) { DATA = window.__SAFEARENA_DATA__; return true; }
+      return false;
+    }
+
+    // ---------- Helpers ----------
+    function getScenario(id) { return DATA.scenarios.find(s => s.id === id); }
+    function getAgent(sid, aid) {
+      const s = getScenario(sid);
+      return s ? s.agents.find(a => a.id === aid) : null;
+    }
+    function getModelObj(sid, aid, mname) {
+      const a = getAgent(sid, aid);
+      return a ? a.models.find(m => m.name === mname) : null;
+    }
+
+    // ---------- Charts ----------
+    const CHARTS = [];
+    function destroyAllCharts() { while (CHARTS.length) { try { CHARTS.pop().destroy(); } catch(e) {} } }
+    function trackChart(c) { CHARTS.push(c); return c; }
+
+    const PAYLOAD_COLORS = {
+      "clean":           "rgba(120,130,145,0.85)",
+      "warning":         "rgba(214,195,60,0.85)",
+      "ipi":             "rgba(214,130,60,0.85)",
+      "gcg":             "rgba(214,67,90,0.85)",
+      "autoguard":       "rgba(124,58,237,0.85)",
+      "vision_autoguard":"rgba(59,130,246,0.85)",
+    };
+    function colorForPayload(name, idx) {
+      return PAYLOAD_COLORS[name] || `hsl(${(idx * 67) % 360}, 60%, 55%)`;
+    }
+
+    const METRIC_META = {
+      ASR:    { label: "ASR ↓ (%)",    color: "rgba(214,67,90,0.8)",   desc: "Attack Success Rate — lower is safer" },
+      DSR:    { label: "DSR ↑ (%)",    color: "rgba(45,138,85,0.8)",   desc: "Defense Success Rate — higher is safer" },
+      TCR:    { label: "TCR ↑ (%)",    color: "rgba(29,111,191,0.8)",  desc: "Task Completion Rate" },
+      KS_TRR: { label: "KS-TRR ↑ (%)", color: "rgba(124,58,237,0.8)", desc: "Kill Switch Triggered Refusal Rate" },
+      ARIA:   { label: "ARIA ↓ (1–4)", color: "rgba(196,125,0,0.8)",  desc: "Agent Risk Index by Action (1=safest)" },
+    };
+
+    function commonOpts(yLabel, maxY) {
+      return {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "top" },
+          tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${fmtVal(ctx.parsed.y)}` } }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: maxY || 100,
+            title: { display: true, text: yLabel || "Score (%)" },
+            ticks: { callback: (v) => v }
+          }
+        }
+      };
+    }
+
+    function hasData(model) {
+      return model.results && Object.keys(model.results).length > 0;
+    }
+
+    function pickVal(model, payload, metric) {
+      const r = (model.results || {})[payload];
+      if (!r || r[metric] == null) return null;
+      const v = r[metric];
+      if (typeof v === "object") return v.overall != null ? toNum(v.overall) : null;
+      return toNum(v);
+    }
+
+    function pickByType(model, payload, metric) {
+      const r = (model.results || {})[payload];
+      if (!r || !r[metric]) return null;
+      const v = r[metric];
+      if (typeof v === "object" && v.by_attack_type) return v.by_attack_type;
+      return null;
+    }
+
+    function toNum(v) {
+      if (v === null || v === undefined || v === "") return 0;
+      return isNaN(Number(v)) ? 0 : Number(v);
+    }
+    function fmtVal(v) {
+      if (v === null || v === undefined) return "—";
+      return toNum(v).toFixed(1);
+    }
+
+    // ---------- Breadcrumb ----------
+    function setBreadcrumb(parts) {
+      const el = document.getElementById("breadcrumb");
+      el.innerHTML = parts.map((p, i) => {
+        const isLast = i === parts.length - 1;
+        const node = isLast
+          ? `<span class="current">${esc(p.label)}</span>`
+          : `<a href="#${p.path}">${esc(p.label)}</a>`;
+        return i === 0 ? node : `<span class="sep">/</span>${node}`;
+      }).join("");
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    }
+
+    // ---------- Agent type tags ----------
+    function agentTag(agent) {
+      const id = agent.id || "";
+      if (id.includes("vision")) return { cls: "tag-vision", label: "Vision" };
+      if (id.includes("openclaw")) return { cls: "tag-openclaw", label: "OpenClaw" };
+      return { cls: "tag-text", label: "Text" };
+    }
+
+    // ---------- Render: Home ----------
+    function renderHome() {
+      setBreadcrumb([{ label: "Home", path: "/" }]);
+      const b = DATA.benchmark;
+      const rqHtml = (b.research_questions || []).map(q => `<li>${esc(q)}</li>`).join("");
+
+      const metricsHtml = Object.entries(b.metrics || {}).map(([k, v]) => {
+        const cls = { ASR:"mn-asr", DSR:"mn-dsr", TCR:"mn-tcr", KS_TRR:"mn-ks", ARIA:"mn-aria", HQ:"mn-hq", TAR:"mn-tar" }[k] || "";
+        return `<div class="metric-item"><div class="metric-name ${cls}">${esc(k.replace("_"," "))}</div><div class="metric-desc">${esc(v)}</div></div>`;
+      }).join("");
+
+      const envPills = (b.environments || []).map(e => `<span class="pill">${esc(e)}</span>`).join("");
+
+      const scenarioCards = DATA.scenarios.map(s => `
+        <div class="card" data-nav="/scenario/${encodeURIComponent(s.id)}">
+          <span class="card-tag tag-scenario">Scenario</span>
+          <h3>${esc(s.name)}</h3>
+          <p>${esc(s.short_description)}</p>
+          <div class="card-footer">${s.agents.length} agent types · Explore →</div>
+        </div>`).join("");
+
+      document.getElementById("app").innerHTML = `
+        <section class="hero">
+          <h1>${esc(b.title)}</h1>
+          <div class="subtitle">${esc(b.subtitle || "")}</div>
+          <p>${esc(b.description)}</p>
+          ${rqHtml ? `<ul class="rq-list">${rqHtml}</ul>` : ""}
+          <div style="margin-top:18px">
+            <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:8px;font-weight:600">Environments</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">${envPills}</div>
+          </div>
+        </section>
+
+        <h2 class="section-title">Metrics Reference</h2>
+        <div class="metrics-legend">${metricsHtml}</div>
+
+        <h2 class="section-title" style="margin-top:32px">Scenarios</h2>
+        <p class="lead">Select a scenario to inspect agent and model performance.</p>
+        <div class="card-grid">${scenarioCards}</div>
+      `;
+      bindCardNavs();
+    }
+
+    // ---------- Render: Scenario ----------
+    function renderScenario(sid) {
+      const s = getScenario(sid);
+      if (!s) return renderNotFound("scenario " + sid);
+
+      setBreadcrumb([
+        { label: "Home", path: "/" },
+        { label: s.name, path: "/scenario/" + encodeURIComponent(sid) }
+      ]);
+
+      const attackPills = (s.attack_types || []).map(t => `<span class="pill">${esc(t)}</span>`).join("");
+      const payloadPills = (s.payloads || []).map(p => `<span class="pill">${esc(p)}</span>`).join("");
+
+      const agentCards = s.agents.map(a => {
+        const tag = agentTag(a);
+        const modelsWithData = a.models.filter(hasData);
+        const dataStr = modelsWithData.length > 0
+          ? `${modelsWithData.length}/${a.models.length} models have data`
+          : `No data yet`;
+        return `
+          <div class="card" data-nav="/scenario/${encodeURIComponent(sid)}/agent/${encodeURIComponent(a.id)}">
+            <span class="card-tag ${tag.cls}">${tag.label}</span>
+            <h3>${esc(a.name)}</h3>
+            <p>${esc(a.description)}</p>
+            <div class="card-footer">${a.models.length} models · ${dataStr} · Details →</div>
+          </div>`;
+      }).join("");
+
+      // Summary chart placeholder (will render if any data exists)
+      const anyData = s.agents.some(a => a.models.some(hasData));
+
+      document.getElementById("app").innerHTML = `
+        <section class="panel">
+          <span class="card-tag tag-scenario" style="display:inline-block">Scenario</span>
+          <h3 style="margin-top:8px">${esc(s.name)}</h3>
+          <p>${esc(s.long_description || s.short_description)}</p>
+          <div class="meta">
+            <span class="pill"><strong>Attack types:</strong></span>${attackPills}
+          </div>
+          <div class="meta" style="margin-top:6px">
+            <span class="pill"><strong>Payloads:</strong></span>${payloadPills}
+          </div>
+        </section>
+
+        <h2 class="section-title">Agent Types</h2>
+        <div class="card-grid" style="margin-bottom:28px">${agentCards}</div>
+
+        ${anyData ? `
+        <section class="panel">
+          <h3>Agent Summary — ASR & DSR (autoguard payload)</h3>
+          <p>Mean ASR/DSR across models, grouped by agent type under the autoguard payload.</p>
+          <div class="chart-wrap"><canvas id="scenario-chart"></canvas></div>
+        </section>
+        ` : `
+        <div class="pending-banner">
+          <strong>No experiment data yet.</strong>
+          Run experiments and populate <code>safearena_data.js</code> with results to enable charts and tables.
+        </div>`}
+      `;
+      bindCardNavs();
+      if (anyData) drawScenarioSummaryChart(s);
+    }
+
+    // ---------- Render: Agent ----------
+    function renderAgent(sid, aid) {
+      const s = getScenario(sid);
+      const a = getAgent(sid, aid);
+      if (!s || !a) return renderNotFound("agent " + aid);
+
+      const tag = agentTag(a);
+      setBreadcrumb([
+        { label: "Home", path: "/" },
+        { label: s.name, path: "/scenario/" + encodeURIComponent(sid) },
+        { label: a.name, path: "/scenario/" + encodeURIComponent(sid) + "/agent/" + encodeURIComponent(aid) }
+      ]);
+
+      const payloads = a.payloads || [];
+      const metrics = ["ASR", "DSR", "TCR", "KS_TRR", "ARIA"];
+      const availMetrics = metrics.filter(mk =>
+        a.models.some(m => payloads.some(p => pickVal(m, p, mk) !== null))
+      );
+
+      const headerCols = payloads.map((p, i) =>
+        `<th class="${i===0?"col-group":""}" colspan="2">${esc(p)}</th>`
+      ).join("");
+      const subHeaderCols = payloads.map((p, i) =>
+        `<th class="${i===0?"col-group":""} num asr" style="font-size:11px">ASR↓</th><th class="num dsr" style="font-size:11px">DSR↑</th>`
+      ).join("");
+
+      const rows = a.models.map(m => {
+        const modelHasData = hasData(m);
+        const cells = payloads.map((p, i) => {
+          const asr = pickVal(m, p, "ASR");
+          const dsr = pickVal(m, p, "DSR");
+          return `
+            <td class="num asr ${i===0?"col-group":""}">${asr !== null ? fmtVal(asr)+"%" : '<span class="no-data-badge">—</span>'}</td>
+            <td class="num dsr">${dsr !== null ? fmtVal(dsr)+"%" : '<span class="no-data-badge">—</span>'}</td>`;
+        }).join("");
+        return `
+          <tr class="clickable" data-nav="/scenario/${encodeURIComponent(sid)}/agent/${encodeURIComponent(aid)}/model/${encodeURIComponent(m.name)}">
+            <td>
+              <div style="font-weight:600">${esc(m.name)}</div>
+              ${m.provider ? `<div style="font-size:12px;color:var(--text-muted)">${esc(m.provider)}</div>` : ""}
+              ${!modelHasData ? `<span class="no-data-badge" style="margin-top:4px;display:inline-block">No data</span>` : ""}
+            </td>
+            ${cells}
+          </tr>`;
+      }).join("");
+
+      const noData = !a.models.some(hasData);
+      const activeMetric = availMetrics.length > 0 ? availMetrics[0] : "ASR";
+
+      const metricBtns = (availMetrics.length > 0 ? availMetrics : metrics).map((mk, i) =>
+        `<button data-metric="${mk}" class="${i===0?"active":""}">${mk.replace("_","-")} ${METRIC_META[mk] ? (mk==="ASR"||mk==="ARIA"?"↓":"↑") : ""}</button>`
+      ).join("");
+
+      document.getElementById("app").innerHTML = `
+        <section class="panel">
+          <span class="card-tag ${tag.cls}" style="display:inline-block">${tag.label} Agent</span>
+          <h3 style="margin-top:8px">${esc(a.name)}</h3>
+          <p>${esc(a.description)}</p>
+          <div class="meta">
+            <span class="pill">Scenario: <strong>${esc(s.name)}</strong></span>
+            <span class="pill">${a.models.length} models</span>
+            <span class="pill">Payloads: ${payloads.join(", ")}</span>
+          </div>
+        </section>
+
+        ${noData ? `<div class="pending-banner"><strong>No experiment results yet.</strong> Data will appear here once experiments are completed and results are loaded into <code>safearena_data.js</code>.</div>` : ""}
+
+        <section class="panel">
+          <h3>Results by model &amp; payload</h3>
+          <p>Toggle metric to switch chart view. Click a model row for attack-type breakdown.</p>
+          <div class="metric-toggle" id="metric-toggle">${metricBtns}</div>
+          <div class="chart-wrap tall"><canvas id="agent-chart"></canvas></div>
+        </section>
+
+        <section class="panel">
+          <h3>Per-model scores — ASR &amp; DSR by payload</h3>
+          <p>Click a row to see the attack-type breakdown.</p>
+          <div style="overflow-x:auto">
+            <table class="results">
+              <thead>
+                <tr><th rowspan="2">Model</th>${headerCols}</tr>
+                <tr>${subHeaderCols}</tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </section>
+      `;
+
+      bindCardNavs();
+      bindRowNavs();
+
+      let curMetric = activeMetric;
+      drawAgentChart(s, a, curMetric);
+      document.querySelectorAll("#metric-toggle button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#metric-toggle button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          curMetric = btn.getAttribute("data-metric");
+          destroyAllCharts();
+          drawAgentChart(s, a, curMetric);
+        });
+      });
+    }
+
+    // ---------- Render: Model ----------
+    function renderModel(sid, aid, mname) {
+      const s = getScenario(sid);
+      const a = getAgent(sid, aid);
+      const m = getModelObj(sid, aid, mname);
+      if (!s || !a || !m) return renderNotFound("model " + mname);
+
+      const tag = agentTag(a);
+      setBreadcrumb([
+        { label: "Home", path: "/" },
+        { label: s.name, path: "/scenario/" + encodeURIComponent(sid) },
+        { label: a.name, path: "/scenario/" + encodeURIComponent(sid) + "/agent/" + encodeURIComponent(aid) },
+        { label: m.name, path: "/scenario/" + encodeURIComponent(sid) + "/agent/" + encodeURIComponent(aid) + "/model/" + encodeURIComponent(mname) }
+      ]);
+
+      const payloads = a.payloads || [];
+      const metrics = ["ASR", "DSR", "TCR", "KS_TRR", "ARIA"];
+
+      const statGroups = payloads.map(p => {
+        const stats = metrics.map(mk => {
+          const v = pickVal(m, p, mk);
+          const cls = { ASR:"asr", DSR:"dsr", TCR:"tcr", ARIA:"aria" }[mk] || "";
+          const suffix = mk === "ARIA" ? "" : "%";
+          return `<div class="stat">
+            <div class="label">${mk.replace("_","-")}</div>
+            <div class="value ${cls} ${v===null?"pending":""}">${v !== null ? fmtVal(v)+suffix : "—"}</div>
+          </div>`;
+        }).join("");
+        return `<div style="margin-bottom:18px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">${esc(p)}</div>
+          <div class="stat-row">${stats}</div>
+        </div>`;
+      }).join("");
+
+      const noData = !hasData(m);
+      const attackTypes = s.attack_types || [];
+      const hasAtk = payloads.some(p => pickByType(m, p, "ASR") !== null);
+
+      document.getElementById("app").innerHTML = `
+        <section class="panel">
+          <span class="card-tag ${tag.cls}" style="display:inline-block">${tag.label}</span>
+          <h3 style="margin-top:8px">${esc(m.name)}</h3>
+          ${m.provider ? `<div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">Provider: ${esc(m.provider)}</div>` : ""}
+          <div class="meta">
+            <span class="pill">Scenario: <strong>${esc(s.name)}</strong></span>
+            <span class="pill">Agent: <strong>${esc(a.name)}</strong></span>
+          </div>
+        </section>
+
+        ${noData ? `<div class="pending-banner"><strong>No data yet for ${esc(m.name)}.</strong> Run this model's experiments and update <code>safearena_data.js</code>.</div>` : ""}
+
+        <section class="panel">
+          <h3>Scores by payload &amp; metric</h3>
+          <p>Per-payload breakdown of all safety metrics.</p>
+          ${statGroups}
+        </section>
+
+        ${hasAtk ? `
+        <section class="panel">
+          <h3>ASR by attack type — across payloads</h3>
+          <p>How the model performs against each attack framing under different payloads. Lower ASR = safer.</p>
+          <div class="chart-wrap tall"><canvas id="model-asr-chart"></canvas></div>
+        </section>
+        <section class="panel">
+          <h3>DSR by attack type — across payloads</h3>
+          <p>Kill-switch defense success rate by attack type. Higher = better defense.</p>
+          <div class="chart-wrap tall"><canvas id="model-dsr-chart"></canvas></div>
+        </section>
+        ` : ""}
+      `;
+
+      if (hasAtk) {
+        drawModelChart(s, a, m, "ASR", "model-asr-chart");
+        drawModelChart(s, a, m, "DSR", "model-dsr-chart");
+      }
+    }
+
+    function renderNotFound(what) {
+      setBreadcrumb([{ label: "Home", path: "/" }]);
+      document.getElementById("app").innerHTML = `
+        <div class="empty-state">
+          <h2>Not found</h2>
+          <p>Could not resolve: <code>${esc(what)}</code></p>
+          <p><a href="#/">← Back to home</a></p>
+        </div>`;
+    }
+
+    // ---------- Charts ----------
+    function drawScenarioSummaryChart(scenario) {
+      const ctx = document.getElementById("scenario-chart");
+      if (!ctx) return;
+      const labels = scenario.agents.map(a => a.name);
+      const payload = "autoguard";
+      const meanASR = scenario.agents.map(a => agentMean(a, payload, "ASR"));
+      const meanDSR = scenario.agents.map(a => agentMean(a, payload, "DSR"));
+      trackChart(new Chart(ctx, {
+        type: "bar",
+        data: { labels, datasets: [
+          { label: "Mean ASR ↓ (autoguard)", data: meanASR, backgroundColor: "rgba(214,67,90,0.85)", borderWidth: 1 },
+          { label: "Mean DSR ↑ (autoguard)", data: meanDSR, backgroundColor: "rgba(45,138,85,0.85)", borderWidth: 1 },
+        ]},
+        options: commonOpts("Score (%)", 100)
+      }));
+    }
+
+    function agentMean(agent, payload, metric) {
+      const vals = agent.models.map(m => pickVal(m, payload, metric)).filter(v => v !== null);
+      if (!vals.length) return null;
+      return vals.reduce((a, b) => a + b, 0) / vals.length;
+    }
+
+    function drawAgentChart(scenario, agent, metric) {
+      const ctx = document.getElementById("agent-chart");
+      if (!ctx) return;
+      const payloads = agent.payloads || [];
+      const labels = agent.models.map(m => m.name);
+      const meta = METRIC_META[metric] || { label: metric };
+      const isARIA = metric === "ARIA";
+      const maxY = isARIA ? 4 : 100;
+
+      const datasets = payloads.map((p, i) => ({
+        label: p,
+        data: agent.models.map(m => pickVal(m, p, metric)),
+        backgroundColor: colorForPayload(p, i),
+        borderWidth: 1
+      }));
+
+      trackChart(new Chart(ctx, {
+        type: "bar",
+        data: { labels, datasets },
+        options: {
+          ...commonOpts(meta.label, maxY),
+          scales: {
+            y: { beginAtZero: true, max: maxY,
+              title: { display: true, text: meta.label },
+              ticks: { callback: v => isARIA ? v : v + "%" }
+            }
+          }
+        }
+      }));
+    }
+
+    function drawModelChart(scenario, agent, model, metric, canvasId) {
+      const ctx = document.getElementById(canvasId);
+      if (!ctx) return;
+      const payloads = agent.payloads || [];
+      const types = scenario.attack_types || [];
+      const meta = METRIC_META[metric] || { label: metric };
+
+      const datasets = payloads.map((p, i) => ({
+        label: p,
+        data: types.map(t => {
+          const bt = pickByType(model, p, metric);
+          return bt ? toNum(bt[t]) : null;
+        }),
+        backgroundColor: colorForPayload(p, i),
+        borderWidth: 1
+      }));
+
+      trackChart(new Chart(ctx, {
+        type: "bar",
+        data: { labels: types, datasets },
+        options: commonOpts(meta.label, 100)
+      }));
+    }
+
+    // ---------- Nav bindings ----------
+    function bindCardNavs() {
+      document.querySelectorAll("[data-nav]").forEach(el => {
+        el.addEventListener("click", () => navigate(el.getAttribute("data-nav")));
+      });
+    }
+    function bindRowNavs() {
+      document.querySelectorAll("tr.clickable[data-nav]").forEach(el => {
+        el.addEventListener("click", () => navigate(el.getAttribute("data-nav")));
+      });
+    }
+
+    // ---------- Boot ----------
+    (function() {
+      if (!loadData()) {
+        document.getElementById("app").innerHTML = `
+          <div style="background:#fff1f2;border:1px solid #f5a8b3;border-radius:12px;padding:22px 26px;color:#7a1f2c;font-size:14.5px">
+            <h2 style="margin-top:0">Could not load SafeArena benchmark data</h2>
+            <p><code>safearena_data.js</code> is missing or did not define <code>window.__SAFEARENA_DATA__</code>.</p>
+          </div>`;
+        return;
+      }
+      if (!window.location.hash) window.location.hash = "#/";
+      dispatch();
+    })();
+  </script>
+</body>
+</html>

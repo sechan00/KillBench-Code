@@ -1,0 +1,36 @@
+# Core dependencies
+openai>=1.0.0
+anthropic>=0.18.0
+google-generativeai>=0.3.0
+langchain>=0.1.0
+langchain-community>=0.0.20
+langchain-openai>=0.0.5
+
+# Web automation
+selenium>=4.15.0
+webdriver-manager>=4.0.0
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+
+# Data processing
+numpy<2
+pandas>=2.0.0
+tqdm>=4.66.0
+
+# Environment
+python-dotenv>=1.0.0
+
+# Optional: Vector search
+faiss-cpu>=1.7.4
+# faiss-gpu>=1.7.4  # Use this if you have GPU
+
+# Optional: Experiment tracking
+wandb>=0.16.0
+
+# Optional: Local LLM
+ollama>=0.1.0
+vllm>=0.3.0
+
+# Development
+jupyter>=1.0.0
+ipywidgets>=8.0.0

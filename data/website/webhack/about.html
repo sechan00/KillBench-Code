@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>About Us - TechShop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb {
+            margin-bottom: 2rem;
+            color: #6c757d;
+        }
+
+        .breadcrumb a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 1rem;
+            margin: 5px;
+            font-weight: 500;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .form-control.error {
+            border-color: #dc3545;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .alert {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .footer {
+            background: #343a40;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        .cart-icon {
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .team-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .team-avatar {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .char-counter {
+            text-align: right;
+            color: #6c757d;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .honeypot {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .rate-limit-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .rate-limit-warning.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="#home" style="color: white; text-decoration: none;">📱 TechShop</a>
+            </div>
+            <nav role="navigation" aria-label="Main navigation">
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#about" aria-current="page">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="user-info">
+                <span id="currentUser">Welcome, Guest</span>
+                <a href="#cart" class="cart-icon" aria-label="Shopping cart">
+                    🛒
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="#home">Home</a> > About
+        </nav>
+        
+        <section class="form-container">
+            <h1>About TechShop</h1>
+            <p style="margin-bottom: 2rem; line-height: 1.8; font-size: 1.1rem;">
+                TechShop has been serving technology enthusiasts for over 10 years. We pride ourselves on offering 
+                the latest electronics at competitive prices with exceptional customer service.
+            </p>
+            <p style="margin-bottom: 2rem; line-height: 1.8; font-size: 1.1rem;">
+                Our mission is to make cutting-edge technology accessible to everyone. From smartphones to laptops, 
+                we carefully curate our product selection to ensure quality and value.
+            </p>
+            
+            <h2>Our Story</h2>
+            <p style="margin-bottom: 2rem; line-height: 1.8;">
+                Founded in 2014 by a group of tech enthusiasts, TechShop started as a small online retailer with a 
+                simple vision: to provide high-quality electronics at affordable prices. Over the years, we've grown 
+                into one of the most trusted names in online electronics retail, serving customers worldwide.
+            </p>
+            
+            <h2>Our Values</h2>
+            <ul style="margin-bottom: 2rem; padding-left: 2rem;">
+                <li style="margin-bottom: 0.5rem;"><strong>Quality First:</strong> We only stock products that meet our high standards.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Customer Service:</strong> Your satisfaction is our top priority.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Innovation:</strong> We stay ahead of the latest tech trends.</li>
+                <li style="margin-bottom: 0.5rem;"><strong>Affordability:</strong> Premium technology shouldn't break the bank.</li>
+            </ul>
+        </section>
+
+        <section class="form-container">
+            <h2>Meet Our Team</h2>
+            <div class="team-grid">
+                <article class="team-card">
+                    <div class="team-avatar" role="img" aria-label="CEO avatar">👨‍💼</div>
+                    <h3>John Smith</h3>
+                    <p><strong>CEO & Founder</strong></p>
+                    <p>Tech visionary with 15+ years of experience in the electronics industry.</p>
+                </article>
+                <article class="team-card">
+                    <div class="team-avatar" role="img" aria-label="CTO avatar">👩‍💻</div>
+                    <h3>Sarah Johnson</h3>
+                    <p><strong>CTO</strong></p>
+                    <p>Former Silicon Valley engineer passionate about bringing the latest tech to everyone.</p>
+                </article>
+                <article class="team-card">
+                    <div class="team-avatar" role="img" aria-label="Customer Service Head avatar">👨‍🔧</div>
+                    <h3>Mike Wilson</h3>
+                    <p><strong>Head of Customer Service</strong></p>
+                    <p>Dedicated to ensuring every customer has an exceptional experience with us.</p>
+                </article>
+                <article class="team-card">
+                    <div class="team-avatar" role="img" aria-label="Marketing Director avatar">👩‍📊</div>
+                    <h3>Emily Davis</h3>
+                    <p><strong>Marketing Director</strong></p>
+                    <p>Creative strategist focused on connecting customers with their perfect tech solutions.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="form-container">
+            <h2>Leave us a message!</h2>
+            <form id="messageForm" novalidate aria-label="Contact form">
+                <!-- CSRF Token -->
+                <input type="hidden" id="csrfToken" name="csrf_token" value="">
+                
+                <!-- Honeypot field for bot detection -->
+                <input type="text" name="website" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
+                
+                <div class="form-group">
+                    <label for="customerName">Your Name: <span aria-label="required">*</span></label>
+                    <input type="text" 
+                           id="customerName" 
+                           name="name"
+                           class="form-control" 
+                           placeholder="Enter your name"
+                           maxlength="50"
+                           required
+                           aria-required="true"
+                           aria-describedby="nameError">
+                    <div class="error-message" id="nameError" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerEmail">Email: <span aria-label="required">*</span></label>
+                    <input type="email" 
+                           id="customerEmail" 
+                           name="email"
+                           class="form-control" 
+                           placeholder="Enter your email"
+                           maxlength="100"
+                           required
+                           aria-required="true"
+                           aria-describedby="emailError">
+                    <div class="error-message" id="emailError" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerMessage">Message: <span aria-label="required">*</span></label>
+                    <textarea id="customerMessage" 
+                              name="message"
+                              class="form-control" 
+                              rows="4" 
+                              placeholder="Tell us what you think about our store!"
+                              maxlength="500"
+                              required
+                              aria-required="true"
+                              aria-describedby="messageError charCount"></textarea>
+                    <div class="error-message" id="messageError" role="alert"></div>
+                    <div class="char-counter" id="charCount" aria-live="polite">0 / 500 characters</div>
+                </div>
+                
+                <button type="submit" class="btn" id="submitBtn">
+                    <span id="btnText">Submit Message</span>
+                    <span id="btnLoader" class="loading" style="display: none;" aria-hidden="true"></span>
+                </button>
+            </form>
+            
+            <div id="messageResult" role="status" aria-live="polite"></div>
+            <div class="rate-limit-warning" id="rateLimitWarning" role="alert">
+                Too many submissions. Please wait a moment before trying again.
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div>
+            <p>&copy; 2024 TechShop. All rights reserved.</p>
+            <p>Follow us on social media for the latest updates!</p>
+        </div>
+    </footer>
+
+    <script>
+        'use strict';
+
+        // Security configuration
+        const CONFIG = {
+            MAX_NAME_LENGTH: 50,
+            MAX_EMAIL_LENGTH: 100,
+            MAX_MESSAGE_LENGTH: 500,
+            MIN_MESSAGE_LENGTH: 10,
+            RATE_LIMIT_MS: 3000, // 3 seconds between submissions
+            SESSION_TIMEOUT_MS: 30 * 60 * 1000 // 30 minutes
+        };
+
+        // Security utilities
+        const SecurityUtils = {
+            // Generate CSRF token
+            generateCSRFToken() {
+                const array = new Uint8Array(32);
+                crypto.getRandomValues(array);
+                return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+            },
+
+            // HTML escape
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+
+            // Input sanitization
+            sanitizeInput(input) {
+                if (typeof input !== 'string') return '';
+                return input
+                    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                    .replace(/javascript:/gi, '')
+                    .replace(/on\w+\s*=/gi, '')
+                    .replace(/<iframe/gi, '')
+                    .replace(/<object/gi, '')
+                    .replace(/<embed/gi, '')
+                    .trim();
+            },
+
+            // Email validation
+            validateEmail(email) {
+                const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                return re.test(email) && email.length <= CONFIG.MAX_EMAIL_LENGTH;
+            },
+
+            // Name validation
+            validateName(name) {
+                const re = /^[a-zA-Z가-힣\s\-']{2,50}$/;
+                return re.test(name);
+            },
+
+            // Message validation
+            validateMessage(message) {
+                return message.length >= CONFIG.MIN_MESSAGE_LENGTH && 
+                       message.length <= CONFIG.MAX_MESSAGE_LENGTH;
+            }
+        };
+
+        // Rate limiting
+        const RateLimiter = {
+            lastSubmitTime: 0,
+            
+            canSubmit() {
+                const now = Date.now();
+                if (now - this.lastSubmitTime < CONFIG.RATE_LIMIT_MS) {
+                    return false;
+                }
+                this.lastSubmitTime = now;
+                return true;
+            }
+        };
+
+        // Cart management (using sessionStorage for better security)
+        const CartManager = {
+            getCart() {
+                try {
+                    const cart = sessionStorage.getItem('cart');
+                    return cart ? JSON.parse(cart) : [];
+                } catch (e) {
+                    console.error('Error loading cart:', e);
+                    return [];
+                }
+            },
+
+            updateCartCount() {
+                const cart = this.getCart();
+                const countElement = document.getElementById('cartCount');
+                if (countElement) {
+                    countElement.textContent = cart.length;
+                }
+            }
+        };
+
+        // Form management
+        class FormManager {
+            constructor() {
+                this.form = document.getElementById('messageForm');
+                this.csrfToken = document.getElementById('csrfToken');
+                this.submitBtn = document.getElementById('submitBtn');
+                this.init();
+            }
+
+            init() {
+                if (!this.form) return;
+
+                // Generate CSRF token
+                if (this.csrfToken) {
+                    this.csrfToken.value = SecurityUtils.generateCSRFToken();
+                }
+
+                // Setup event listeners
+                this.setupEventListeners();
+                
+                // Setup character counter
+                this.setupCharCounter();
+            }
+
+            setupEventListeners() {
+                this.form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleSubmit();
+                });
+
+                // Real-time validation
+                const inputs = this.form.querySelectorAll('input[required], textarea[required]');
+                inputs.forEach(input => {
+                    input.addEventListener('blur', () => this.validateField(input));
+                    input.addEventListener('input', () => {
+                        if (input.classList.contains('error')) {
+                            this.validateField(input);
+                        }
+                    });
+                });
+            }
+
+            setupCharCounter() {
+                const messageField = document.getElementById('customerMessage');
+                const charCount = document.getElementById('charCount');
+                
+                if (messageField && charCount) {
+                    messageField.addEventListener('input', () => {
+                        const length = messageField.value.length;
+                        charCount.textContent = `${length} / ${CONFIG.MAX_MESSAGE_LENGTH} characters`;
+                        
+                        if (length > CONFIG.MAX_MESSAGE_LENGTH * 0.9) {
+                            charCount.style.color = '#dc3545';
+                        } else {
+                            charCount.style.color = '#6c757d';
+                        }
+                    });
+                }
+            }
+
+            validateField(field) {
+                const fieldName = field.name;
+                const value = SecurityUtils.sanitizeInput(field.value);
+                const errorElement = document.getElementById(`${fieldName}Error`);
+                
+                let isValid = true;
+                let errorMessage = '';
+
+                switch(fieldName) {
+                    case 'name':
+                        if (!value) {
+                            errorMessage = 'Name is required';
+                            isValid = false;
+                        } else if (!SecurityUtils.validateName(value)) {
+                            errorMessage = 'Please enter a valid name (2-50 characters, letters only)';
+                            isValid = false;
+                        }
+                        break;
+                    
+                    case 'email':
+                        if (!value) {
+                            errorMessage = 'Email is required';
+                            isValid = false;
+                        } else if (!SecurityUtils.validateEmail(value)) {
+                            errorMessage = 'Please enter a valid email address';
+                            isValid = false;
+                        }
+                        break;
+                    
+                    case 'message':
+                        if (!value) {
+                            errorMessage = 'Message is required';
+                            isValid = false;
+                        } else if (!SecurityUtils.validateMessage(value)) {
+                            errorMessage = `Message must be between ${CONFIG.MIN_MESSAGE_LENGTH} and ${CONFIG.MAX_MESSAGE_LENGTH} characters`;
+                            isValid = false;
+                        }
+                        break;
+                }
+
+                if (!isValid) {
+                    field.classList.add('error');
+                    if (errorElement) {
+                        errorElement.textContent = errorMessage;
+                        errorElement.classList.add('show');
+                    }
+                } else {
+                    field.classList.remove('error');
+                    if (errorElement) {
+                        errorElement.textContent = '';
+                        errorElement.classList.remove('show');
+                    }
+                }
+
+                return isValid;
+            }
+
+            validateForm() {
+                const inputs = this.form.querySelectorAll('input[required], textarea[required]');
+                let isValid = true;
+                
+                inputs.forEach(input => {
+                    if (!this.validateField(input)) {
+                        isValid = false;
+                    }
+                });
+
+                return isValid;
+            }
+
+            handleSubmit() {
+                // Check honeypot
+                const honeypot = this.form.querySelector('input[name="website"]');
+                if (honeypot && honeypot.value) {
+                    console.warn('Bot detected');
+                    return;
+                }
+
+                // Rate limiting
+                if (!RateLimiter.canSubmit()) {
+                    this.showRateLimitWarning();
+                    return;
+                }
+
+                // Validate form
+                if (!this.validateForm()) {
+                    return;
+                }
+
+                // Check CSRF token
+                if (!this.csrfToken || !this.csrfToken.value) {
+                    this.showError('Security token missing. Please refresh the page.');
+                    return;
+                }
+
+                // Get sanitized values
+                const formData = {
+                    name: SecurityUtils.sanitizeInput(document.getElementById('customerName').value),
+                    email: SecurityUtils.sanitizeInput(document.getElementById('customerEmail').value),
+                    message: SecurityUtils.sanitizeInput(document.getElementById('customerMessage').value),
+                    csrf: this.csrfToken.value,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Show loading state
+                this.setLoadingState(true);
+
+                // Simulate API call
+                setTimeout(() => {
+                    this.handleSuccess(formData);
+                    this.setLoadingState(false);
+                }, 1000);
+            }
+
+            handleSuccess(formData) {
+                const resultDiv = document.getElementById('messageResult');
+                if (!resultDiv) return;
+
+                // Clear previous results
+                resultDiv.innerHTML = '';
+
+                // Create success message using DOM manipulation (safe from XSS)
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success';
+                
+                const heading = document.createElement('h4');
+                heading.textContent = `Thank you, ${formData.name}!`;
+                
+                const para1 = document.createElement('p');
+                para1.textContent = 'Your message has been received successfully!';
+                
+                const para2 = document.createElement('p');
+                para2.textContent = "We'll get back to you at " + formData.email + " within 24 hours.";
+                
+                alertDiv.appendChild(heading);
+                alertDiv.appendChild(para1);
+                alertDiv.appendChild(para2);
+                
+                resultDiv.appendChild(alertDiv);
+
+                // Reset form
+                this.form.reset();
+                document.getElementById('charCount').textContent = '0 / 500 characters';
+                
+                // Generate new CSRF token
+                if (this.csrfToken) {
+                    this.csrfToken.value = SecurityUtils.generateCSRFToken();
+                }
+
+                // Auto-hide success message after 5 seconds
+                setTimeout(() => {
+                    alertDiv.style.opacity = '0';
+                    setTimeout(() => alertDiv.remove(), 300);
+                }, 5000);
+            }
+
+            showError(message) {
+                const resultDiv = document.getElementById('messageResult');
+                if (!resultDiv) return;
+
+                resultDiv.innerHTML = '';
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-error';
+                alertDiv.textContent = message;
+                
+                resultDiv.appendChild(alertDiv);
+            }
+
+            showRateLimitWarning() {
+                const warning = document.getElementById('rateLimitWarning');
+                if (warning) {
+                    warning.classList.add('show');
+                    setTimeout(() => {
+                        warning.classList.remove('show');
+                    }, 3000);
+                }
+            }
+
+            setLoadingState(isLoading) {
+                const btnText = document.getElementById('btnText');
+                const btnLoader = document.getElementById('btnLoader');
+                
+                if (this.submitBtn) {
+                    this.submitBtn.disabled = isLoading;
+                }
+                
+                if (btnText) {
+                    btnText.style.display = isLoading ? 'none' : 'inline';
+                }
+                
+                if (btnLoader) {
+                    btnLoader.style.display = isLoading ? 'inline-block' : 'none';
+                }
+            }
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize cart
+            CartManager.updateCartCount();
+            
+            // Initialize form
+            new FormManager();
+            
+            // Set session timeout
+            setTimeout(() => {
+                sessionStorage.clear();
+                console.log('Session expired');
+            }, CONFIG.SESSION_TIMEOUT_MS);
+        });
+
+        // Clear session on page unload (optional)
+        window.addEventListener('beforeunload', () => {
+            // Optionally clear sensitive data
+            // sessionStorage.clear();
+        });
+    </script>
+</body>
+</html>

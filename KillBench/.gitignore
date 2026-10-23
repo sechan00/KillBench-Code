@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+env/
+
+# Environment variables / secrets
+.env
+.env.*
+*.key
+secrets.*
+
+# Logs
+logs/
+*.log
+log/
+nohup.out
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# External vendored repo (clone separately from upstream)
+safearena_repo/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large local caches
+*.pt
+*.bin
+*.safetensors
+
+agent_results/
+safearena_repo/
+
+# Experiment result files
+eval_*.json
+results_*.json
+baseline_*.json

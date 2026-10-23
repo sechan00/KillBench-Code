@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kill Switch Benchmark — Visualizer</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --surface-2: #f0f2f8;
+      --border: #e2e5ee;
+      --text: #1f2330;
+      --text-muted: #5b6270;
+      --primary: #4a6cf7;
+      --primary-soft: #e8edff;
+      --accent-green: #2d8a55;
+      --accent-red: #d6435a;
+      --accent-purple: #7c3aed;
+      --accent-purple-soft: #ede9fe;
+      --shadow: 0 1px 3px rgba(20, 28, 60, 0.06), 0 4px 12px rgba(20, 28, 60, 0.04);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    header.site-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+    }
+    .site-header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+    }
+    .brand { font-weight: 700; font-size: 16px; letter-spacing: -0.01em; color: var(--text); }
+    .brand .dot { color: var(--primary); }
+
+    main.landing {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 28px 80px;
+    }
+    .landing-hero {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+    .landing-hero h1 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 0 0 10px;
+    }
+    .landing-hero p {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .version-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 640px) {
+      .version-grid { grid-template-columns: 1fr; }
+    }
+    .version-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 30px;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+    .version-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(20, 28, 60, 0.1);
+    }
+    .version-card.simple:hover { border-color: var(--primary); }
+    .version-card.safearena:hover { border-color: var(--accent-purple); }
+
+    .version-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+    .badge-simple { background: var(--primary-soft); color: var(--primary); }
+    .badge-safearena { background: var(--accent-purple-soft); color: var(--accent-purple); }
+
+    .version-card h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+    .version-card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 14.5px;
+      flex-grow: 1;
+    }
+    .version-card .card-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .version-card .cta {
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .cta-simple { color: var(--primary); }
+    .cta-safearena { color: var(--accent-purple); }
+
+    footer.site-footer {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 20px 28px 50px;
+      color: var(--text-muted);
+      font-size: 13px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <div class="brand">Kill Switch <span class="dot">·</span> Benchmark Visualizer</div>
+    </div>
+  </header>
+
+  <main class="landing">
+    <div class="landing-hero">
+      <h1>Kill Switch Benchmark</h1>
+      <p>Comprehensive safety evaluation framework for LLM web agents. Choose a benchmark version below.</p>
+    </div>
+
+    <div class="version-grid">
+      <a class="version-card simple" href="simple.html">
+        <span class="version-badge badge-simple">Simple Version</span>
+        <h2>Simple Benchmark</h2>
+        <p>Lightweight kill-switch evaluation using direct prompt injection, warning-based, and AutoGuard defenses. Results from text-based agents across multiple LLM backends.</p>
+        <div class="card-pills">
+          <span class="pill">GenericAgent</span>
+          <span class="pill">BrowserUse</span>
+          <span class="pill">GPT-4o</span>
+          <span class="pill">AutoGuard</span>
+          <span class="pill">DSR · ASR</span>
+        </div>
+        <div class="cta cta-simple">Explore Simple Benchmark →</div>
+      </a>
+
+      <a class="version-card safearena" href="safearena.html">
+        <span class="version-badge badge-safearena">SafeArena Version</span>
+        <h2>KillSwitch Bench</h2>
+        <p>Full SafeArena-based benchmark with 250 augmented harmful tasks. Evaluates text, vision, and agentic models across comprehensive attack payloads and kill-switch metrics.</p>
+        <div class="card-pills">
+          <span class="pill">Text Agent</span>
+          <span class="pill">Vision Agent</span>
+          <span class="pill">OpenClaw</span>
+          <span class="pill">250 Tasks</span>
+          <span class="pill">ASR · DSR · ARIA · KS-TRR</span>
+        </div>
+        <div class="cta cta-safearena">Explore KillSwitch Bench →</div>
+      </a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Kill Switch Benchmark Visualizer · TrustML Lab
+  </footer>
+</body>
+</html>

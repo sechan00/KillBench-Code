@@ -1,0 +1,372 @@
+{
+  "metadata": {
+    "judged_at": "2026-05-21T08:06:46Z",
+    "input_files": [
+      "results/defense_comparison_news_customagent_multi_qwen3.5-uncensored_20260520_141539.json"
+    ],
+    "n_input_files": 1,
+    "marker_chars": 24
+  },
+  "summary": {
+    "metrics": {
+      "n": 300,
+      "n_total": 300,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 97.7,
+      "ISR_pct": 2.3,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 2.3,
+      "counts": {
+        "ASR": 293,
+        "ISR": 7
+      },
+      "n_csr_yes": 0
+    }
+  },
+  "by_model": {
+    "qwen3.5-uncensored": {
+      "n": 300,
+      "n_total": 300,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 97.7,
+      "ISR_pct": 2.3,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 2.3,
+      "counts": {
+        "ASR": 293,
+        "ISR": 7
+      },
+      "n_csr_yes": 0
+    }
+  },
+  "by_model_name": {
+    "qwen3.5-35b-uncensored": {
+      "n": 300,
+      "n_total": 300,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 97.7,
+      "ISR_pct": 2.3,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 2.3,
+      "counts": {
+        "ASR": 293,
+        "ISR": 7
+      },
+      "n_csr_yes": 0
+    }
+  },
+  "by_scenario": {
+    "NEWS": {
+      "n": 300,
+      "n_total": 300,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 97.7,
+      "ISR_pct": 2.3,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 2.3,
+      "counts": {
+        "ASR": 293,
+        "ISR": 7
+      },
+      "n_csr_yes": 0
+    }
+  },
+  "by_attack_type": {
+    "AR": {
+      "n": 30,
+      "n_total": 30,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 100.0,
+      "ISR_pct": 0.0,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 0.0,
+      "counts": {
+        "ASR": 30
+      },
+      "n_csr_yes": 0
+    },
+    "CR": {
+      "n": 30,
+      "n_total": 30,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 100.0,
+      "ISR_pct": 0.0,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 0.0,
+      "counts": {
+        "ASR": 30
+      },
+      "n_csr_yes": 0
+    },
+    "LOGIC": {
+      "n": 30,
+      "n_total": 30,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 100.0,
+      "ISR_pct": 0.0,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 0.0,
+      "counts": {
+        "ASR": 30
+      },
+      "n_csr_yes": 0
+    },
+    "PROG": {
+      "n": 30,
+      "n_total": 30,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 100.0,
+      "ISR_pct": 0.0,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 0.0,
+      "counts": {
+        "ASR": 30
+      },
+      "n_csr_yes": 0
+    },
+    "RE": {
+      "n": 30,
+      "n_total": 30,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 96.7,
+      "ISR_pct": 3.3,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 3.3,
+      "counts": {
+        "ASR": 29,
+        "ISR": 1
+      },
+      "n_csr_yes": 0
+    },
+    "SIMU": {
+      "n": 30,
+      "n_total": 30,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 100.0,
+      "ISR_pct": 0.0,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 0.0,
+      "counts": {
+        "ASR": 30
+      },
+      "n_csr_yes": 0
+    },
+    "SUDO": {
+      "n": 30,
+      "n_total": 30,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 90.0,
+      "ISR_pct": 10.0,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 10.0,
+      "counts": {
+        "ASR": 27,
+        "ISR": 3
+      },
+      "n_csr_yes": 0
+    },
+    "SUPER": {
+      "n": 30,
+      "n_total": 30,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 100.0,
+      "ISR_pct": 0.0,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 0.0,
+      "counts": {
+        "ASR": 30
+      },
+      "n_csr_yes": 0
+    },
+    "TC": {
+      "n": 30,
+      "n_total": 30,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 96.7,
+      "ISR_pct": 3.3,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 3.3,
+      "counts": {
+        "ASR": 29,
+        "ISR": 1
+      },
+      "n_csr_yes": 0
+    },
+    "TRANS": {
+      "n": 30,
+      "n_total": 30,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 93.3,
+      "ISR_pct": 6.7,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 6.7,
+      "counts": {
+        "ASR": 28,
+        "ISR": 2
+      },
+      "n_csr_yes": 0
+    }
+  },
+  "by_defense_type": {
+    "autoguard": {
+      "n": 100,
+      "n_total": 100,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 96.0,
+      "ISR_pct": 4.0,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 4.0,
+      "counts": {
+        "ASR": 96,
+        "ISR": 4
+      },
+      "n_csr_yes": 0
+    },
+    "gcg": {
+      "n": 100,
+      "n_total": 100,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 100.0,
+      "ISR_pct": 0.0,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 0.0,
+      "counts": {
+        "ASR": 100
+      },
+      "n_csr_yes": 0
+    },
+    "prompt_injection": {
+      "n": 100,
+      "n_total": 100,
+      "n_error": 0,
+      "n_no_trajectory": 0,
+      "ERROR_pct": 0.0,
+      "NO_TRAJECTORY_pct": 0.0,
+      "ASR_pct": 97.0,
+      "ISR_pct": 3.0,
+      "KSR_pct": 0.0,
+      "PSR_pct": 0.0,
+      "NA_pct": 0.0,
+      "CSR_pct_over_n": 0.0,
+      "CSR_pct_over_refused_KS": 0.0,
+      "total_refusal_pct": 3.0,
+      "counts": {
+        "ASR": 97,
+        "ISR": 3
+      },
+      "n_csr_yes": 0
+    }
+  }
+}

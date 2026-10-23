@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Kill Switch Benchmark Visualizer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="experiment_data.js"></script>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --surface-2: #f0f2f8;
+      --border: #e2e5ee;
+      --text: #1f2330;
+      --text-muted: #5b6270;
+      --primary: #4a6cf7;
+      --primary-soft: #e8edff;
+      --accent-dsr: #2d8a55;
+      --accent-asr: #d6435a;
+      --shadow: 0 1px 3px rgba(20, 28, 60, 0.06), 0 4px 12px rgba(20, 28, 60, 0.04);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+        Arial, "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header.site-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .site-header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .brand .dot { color: var(--primary); }
+    nav.breadcrumb {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+    nav.breadcrumb .sep { opacity: 0.5; }
+    nav.breadcrumb a { color: var(--text-muted); }
+    nav.breadcrumb a:hover { color: var(--primary); text-decoration: none; }
+    nav.breadcrumb .current { color: var(--text); font-weight: 600; }
+
+    main.app {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 36px 28px 80px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #ffffff 0%, #eef1ff 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 36px 32px;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      letter-spacing: -0.02em;
+    }
+    .hero .subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 18px;
+    }
+    .hero p { margin: 0 0 12px; max-width: 820px; }
+    .rq-list { margin: 14px 0 0; padding-left: 0; list-style: none; }
+    .rq-list li {
+      padding: 6px 12px;
+      background: rgba(74, 108, 247, 0.08);
+      border-left: 3px solid var(--primary);
+      border-radius: 4px;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    h2.section-title {
+      margin: 28px 0 16px;
+      font-size: 20px;
+      letter-spacing: -0.01em;
+    }
+    .lead {
+      color: var(--text-muted);
+      font-size: 14.5px;
+      margin: -8px 0 18px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(74, 108, 247, 0.12);
+    }
+    .card .card-tag {
+      align-self: flex-start;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 14px;
+      flex-grow: 1;
+    }
+    .card .card-footer {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+    }
+    .panel h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+    .panel p { margin: 0 0 8px; color: var(--text-muted); font-size: 14.5px; }
+    .panel .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      height: 360px;
+    }
+    .chart-wrap.tall { height: 420px; }
+
+    table.results {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    table.results th,
+    table.results td {
+      padding: 10px 12px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+    }
+    table.results th:first-child,
+    table.results td:first-child {
+      text-align: left;
+    }
+    table.results th {
+      background: var(--surface-2);
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    table.results tr.clickable { cursor: pointer; }
+    table.results tr.clickable:hover { background: var(--primary-soft); }
+    table.results .col-group {
+      border-left: 1px solid var(--border);
+    }
+    table.results .num { font-variant-numeric: tabular-nums; }
+    table.results .num.dsr { color: var(--accent-dsr); font-weight: 600; }
+    table.results .num.asr { color: var(--accent-asr); font-weight: 600; }
+
+    .agent-toggle {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .agent-toggle button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.12s ease;
+    }
+    .agent-toggle button:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .agent-toggle button.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state h2 { color: var(--text); margin-bottom: 8px; }
+
+    .error-box {
+      background: #fff1f2;
+      border: 1px solid #f5a8b3;
+      border-radius: 12px;
+      padding: 22px 26px;
+      color: #7a1f2c;
+      font-size: 14.5px;
+    }
+    .error-box code {
+      display: inline-block;
+      background: #fee;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .error-box pre {
+      background: #fff7f8;
+      padding: 10px 12px;
+      border-radius: 6px;
+      overflow: auto;
+      font-size: 13px;
+      margin: 8px 0 0;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 14px 0 0;
+    }
+    .stat {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .stat .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .stat .value {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat .value.dsr { color: var(--accent-dsr); }
+    .stat .value.asr { color: var(--accent-asr); }
+
+    footer.site-footer {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 30px 28px 50px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <div class="brand">Kill Switch <span class="dot">·</span> Benchmark Visualizer</div>
+      <nav class="breadcrumb" id="breadcrumb"></nav>
+      <a href="index.html" style="margin-left:auto;font-size:13px;color:var(--text-muted);text-decoration:none">← All Versions</a>
+    </div>
+  </header>
+
+  <main class="app" id="app">
+    <div class="empty-state">
+      <h2>Loading…</h2>
+      <p>Reading <code>Experiment_data.json</code></p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Local visualizer for the AI Kill Switch benchmark. Update
+    <code>Experiment_data.json</code> to add new runs — the page will pick them up
+    automatically on reload.
+  </footer>
+
+  <script>
+    // ---------- Tiny hash-based router ----------
+    const routes = [
+      { pattern: /^\/?$/, handler: () => renderHome() },
+      { pattern: /^\/scenario\/([^/]+)\/?$/, handler: (m) => renderScenario(decodeURIComponent(m[1])) },
+      {
+        pattern: /^\/scenario\/([^/]+)\/agent\/([^/]+)\/?$/,
+        handler: (m) => renderAgent(decodeURIComponent(m[1]), decodeURIComponent(m[2])),
+      },
+      {
+        pattern: /^\/scenario\/([^/]+)\/agent\/([^/]+)\/model\/([^/]+)\/?$/,
+        handler: (m) =>
+          renderModel(
+            decodeURIComponent(m[1]),
+            decodeURIComponent(m[2]),
+            decodeURIComponent(m[3])
+          ),
+      },
+    ];
+
+    function currentPath() {
+      const h = window.location.hash || "#/";
+      return h.replace(/^#/, "");
+    }
+
+    function navigate(path) {
+      window.location.hash = "#" + path;
+    }
+
+    function dispatch() {
+      const path = currentPath();
+      for (const r of routes) {
+        const m = path.match(r.pattern);
+        if (m) {
+          // Reset chart instances before re-render
+          destroyAllCharts();
+          r.handler(m);
+          return;
+        }
+      }
+      renderNotFound(path);
+    }
+
+    window.addEventListener("hashchange", dispatch);
+
+    // ---------- Data loading ----------
+    let DATA = null;
+    let LOAD_ERROR = null;
+
+    async function loadData() {
+      // Primary: read the data injected by experiment_data.js (works on file://).
+      if (window.__EXPERIMENT_DATA__) {
+        DATA = window.__EXPERIMENT_DATA__;
+        return;
+      }
+      // Fallback: try fetching the JSON directly (works under http://).
+      try {
+        const res = await fetch("Experiment_data.json", { cache: "no-cache" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        DATA = await res.json();
+      } catch (err) {
+        LOAD_ERROR = err;
+      }
+    }
+
+    // ---------- Lookup helpers ----------
+    function getScenario(scenarioId) {
+      return DATA.scenarios.find((s) => s.id === scenarioId);
+    }
+    function getAgent(scenarioId, agentId) {
+      const s = getScenario(scenarioId);
+      if (!s) return null;
+      return s.agents.find((a) => a.id === agentId);
+    }
+    function getModel(scenarioId, agentId, modelName) {
+      const a = getAgent(scenarioId, agentId);
+      if (!a) return null;
+      return a.models.find((m) => m.name === modelName);
+    }
+
+    // ---------- Chart bookkeeping ----------
+    const CHARTS = [];
+    function destroyAllCharts() {
+      while (CHARTS.length) {
+        const c = CHARTS.pop();
+        try { c.destroy(); } catch (e) {}
+      }
+    }
+    function trackChart(c) {
+      CHARTS.push(c);
+      return c;
+    }
+
+    // ---------- Breadcrumb ----------
+    function setBreadcrumb(parts) {
+      const el = document.getElementById("breadcrumb");
+      const html = parts
+        .map((p, i) => {
+          const isLast = i === parts.length - 1;
+          const node = isLast
+            ? `<span class="current">${escapeHtml(p.label)}</span>`
+            : `<a href="#${p.path}">${escapeHtml(p.label)}</a>`;
+          return i === 0 ? node : `<span class="sep">/</span>${node}`;
+        })
+        .join("");
+      el.innerHTML = html;
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    // ---------- Renderers ----------
+    function renderLoadError() {
+      const app = document.getElementById("app");
+      setBreadcrumb([{ label: "Home", path: "/" }]);
+      app.innerHTML = `
+        <div class="error-box">
+          <h2 style="margin-top:0">Could not load benchmark data</h2>
+          <p>
+            <code>experiment_data.js</code> is missing or did not define
+            <code>window.__EXPERIMENT_DATA__</code>. Make sure the file lives next to
+            <code>index.html</code> and was generated from the latest
+            <code>Experiment_data.json</code>.
+          </p>
+          <p>To regenerate it from the JSON source:</p>
+          <pre>cd results/visualize_website
+python3 -c "import json; d=json.load(open('Experiment_data.json')); open('experiment_data.js','w').write('window.__EXPERIMENT_DATA__ = '+json.dumps(d, ensure_ascii=False, indent=2)+';')"</pre>
+          <p style="margin-top:14px"><strong>Underlying error:</strong> ${escapeHtml(
+            (LOAD_ERROR && LOAD_ERROR.message) || "unknown"
+          )}</p>
+        </div>
+      `;
+    }
+
+    function renderHome() {
+      setBreadcrumb([{ label: "Home", path: "/" }]);
+      const b = DATA.benchmark;
+      const scenarioCards = DATA.scenarios
+        .map(
+          (s) => `
+        <div class="card" data-nav="/scenario/${encodeURIComponent(s.id)}">
+          <span class="card-tag">${escapeHtml(s.id)}</span>
+          <h3>${escapeHtml(s.name)}</h3>
+          <p>${escapeHtml(s.short_description)}</p>
+          <div class="card-footer">Explore scenario →</div>
+        </div>`
+        )
+        .join("");
+
+      const rqHtml = (b.research_questions || [])
+        .map((q) => `<li>${escapeHtml(q)}</li>`)
+        .join("");
+
+      const metricsHtml = b.metrics
+        ? `
+        <div class="stat-row">
+          <div class="stat"><div class="label">DSR</div><div class="value dsr">Defense ↑</div><div style="font-size:12.5px;color:var(--text-muted);margin-top:4px">${escapeHtml(
+            b.metrics.DSR
+          )}</div></div>
+          <div class="stat"><div class="label">ASR</div><div class="value asr">Attack ↓</div><div style="font-size:12.5px;color:var(--text-muted);margin-top:4px">${escapeHtml(
+            b.metrics.ASR
+          )}</div></div>
+        </div>`
+        : "";
+
+      document.getElementById("app").innerHTML = `
+        <section class="hero">
+          <h1>${escapeHtml(b.title)}</h1>
+          <div class="subtitle">${escapeHtml(b.subtitle || "")}</div>
+          <p>${escapeHtml(b.description)}</p>
+          ${rqHtml ? `<ul class="rq-list">${rqHtml}</ul>` : ""}
+          ${metricsHtml}
+        </section>
+
+        <h2 class="section-title">Scenarios</h2>
+        <p class="lead">Pick a scenario to inspect agent / model performance.</p>
+        <div class="card-grid">
+          ${scenarioCards}
+        </div>
+      `;
+      bindCardNavs();
+    }
+
+    function renderScenario(scenarioId) {
+      const s = getScenario(scenarioId);
+      if (!s) return renderNotFound("scenario " + scenarioId);
+
+      setBreadcrumb([
+        { label: "Home", path: "/" },
+        { label: s.name, path: "/scenario/" + encodeURIComponent(s.id) },
+      ]);
+
+      const agentCards = s.agents
+        .map(
+          (a) => `
+          <div class="card" data-nav="/scenario/${encodeURIComponent(
+            s.id
+          )}/agent/${encodeURIComponent(a.id)}">
+            <span class="card-tag">Agent</span>
+            <h3>${escapeHtml(a.name)}</h3>
+            <p>${escapeHtml(a.description)}</p>
+            <div class="card-footer">${a.models.length} models · ${
+            (a.defense_methods || []).length
+          } defenses · See details →</div>
+          </div>
+        `
+        )
+        .join("");
+
+      const attackPills = (s.attack_types || [])
+        .map((t) => `<span class="pill">${escapeHtml(t)}</span>`)
+        .join("");
+
+      document.getElementById("app").innerHTML = `
+        <section class="panel">
+          <span class="card-tag" style="display:inline-block">${escapeHtml(s.id)}</span>
+          <h3 style="margin-top:8px">${escapeHtml(s.name)}</h3>
+          <p>${escapeHtml(s.long_description || s.short_description)}</p>
+          <div class="meta">
+            <span class="pill"><strong>Attack types:</strong></span>
+            ${attackPills}
+          </div>
+        </section>
+
+        <h2 class="section-title">Choose an agent</h2>
+        <div class="card-grid" style="margin-bottom:28px">
+          ${agentCards}
+        </div>
+
+        <section class="panel">
+          <h3>Agent summary — DSR & ASR (AutoGuard kill switch)</h3>
+          <p>Per-agent average across models, evaluated against the AutoGuard defense.
+             DSR ↑ is the refusal rate (higher = better defense); ASR ↓ is the attack
+             completion rate (lower = better defense). Per-model breakdown lives on each agent's page.</p>
+          <div class="chart-wrap"><canvas id="scenario-summary-chart"></canvas></div>
+        </section>
+      `;
+
+      bindCardNavs();
+      drawScenarioAgentSummaryChart(s);
+    }
+
+    function renderAgent(scenarioId, agentId) {
+      const s = getScenario(scenarioId);
+      const a = getAgent(scenarioId, agentId);
+      if (!s || !a) return renderNotFound("agent " + agentId);
+
+      setBreadcrumb([
+        { label: "Home", path: "/" },
+        { label: s.name, path: "/scenario/" + encodeURIComponent(s.id) },
+        {
+          label: a.name,
+          path:
+            "/scenario/" +
+            encodeURIComponent(s.id) +
+            "/agent/" +
+            encodeURIComponent(a.id),
+        },
+      ]);
+
+      const defenses = a.defense_methods || [];
+
+      // Build per-defense column-grouped table.
+      const headerCols = defenses
+        .map(
+          (d, i) =>
+            `<th class="${i === 0 ? "col-group" : ""}">${escapeHtml(
+              d
+            )} ASR</th><th>${escapeHtml(d)} DSR</th>`
+        )
+        .join("");
+
+      const rows = a.models
+        .map((m) => {
+          const cells = defenses
+            .map((d, i) => {
+              const r = (m.results || {})[d];
+              const asr = r ? r.ASR.overall : null;
+              const dsr = r ? r.DSR.overall : null;
+              return `
+              <td class="num asr ${i === 0 ? "col-group" : ""}">${formatPct(asr)}</td>
+              <td class="num dsr">${formatPct(dsr)}</td>`;
+            })
+            .join("");
+          return `
+            <tr class="clickable" data-nav="/scenario/${encodeURIComponent(
+              s.id
+            )}/agent/${encodeURIComponent(a.id)}/model/${encodeURIComponent(m.name)}">
+              <td>${escapeHtml(m.name)}</td>
+              ${cells}
+            </tr>
+          `;
+        })
+        .join("");
+
+      document.getElementById("app").innerHTML = `
+        <section class="panel">
+          <span class="card-tag" style="display:inline-block">Agent</span>
+          <h3 style="margin-top:8px">${escapeHtml(a.name)}</h3>
+          <p>${escapeHtml(a.description)}</p>
+          <div class="meta">
+            <span class="pill">Scenario: <strong>${escapeHtml(s.name)}</strong></span>
+            <span class="pill">${a.models.length} models · ${defenses.length} defense methods</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Overall results by model and defense method</h3>
+          <p>Each bar is a (model, defense) pair. Toggle the metric to switch between DSR and ASR.</p>
+          <div class="agent-toggle" id="agent-metric-toggle">
+            <button class="active" data-metric="DSR">DSR ↑</button>
+            <button data-metric="ASR">ASR ↓</button>
+          </div>
+          <div class="chart-wrap tall"><canvas id="agent-chart"></canvas></div>
+        </section>
+
+        <section class="panel">
+          <h3>Per-model overall scores</h3>
+          <p>Click a row to see the attack-type breakdown for a model.</p>
+          <div style="overflow-x:auto">
+            <table class="results">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  ${headerCols}
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </section>
+      `;
+
+      bindCardNavs();
+      bindRowNavs();
+
+      let currentMetric = "DSR";
+      drawAgentChart(s, a, currentMetric);
+      document.querySelectorAll("#agent-metric-toggle button").forEach((b) => {
+        b.addEventListener("click", () => {
+          document
+            .querySelectorAll("#agent-metric-toggle button")
+            .forEach((x) => x.classList.remove("active"));
+          b.classList.add("active");
+          currentMetric = b.getAttribute("data-metric");
+          destroyAllCharts();
+          drawAgentChart(s, a, currentMetric);
+        });
+      });
+    }
+
+    function renderModel(scenarioId, agentId, modelName) {
+      const s = getScenario(scenarioId);
+      const a = getAgent(scenarioId, agentId);
+      const m = getModel(scenarioId, agentId, modelName);
+      if (!s || !a || !m) return renderNotFound("model " + modelName);
+
+      setBreadcrumb([
+        { label: "Home", path: "/" },
+        { label: s.name, path: "/scenario/" + encodeURIComponent(s.id) },
+        {
+          label: a.name,
+          path:
+            "/scenario/" +
+            encodeURIComponent(s.id) +
+            "/agent/" +
+            encodeURIComponent(a.id),
+        },
+        {
+          label: m.name,
+          path:
+            "/scenario/" +
+            encodeURIComponent(s.id) +
+            "/agent/" +
+            encodeURIComponent(a.id) +
+            "/model/" +
+            encodeURIComponent(m.name),
+        },
+      ]);
+
+      const defenses = a.defense_methods || [];
+      const overallStats = defenses
+        .map((d) => {
+          const r = (m.results || {})[d];
+          const asr = r ? r.ASR.overall : null;
+          const dsr = r ? r.DSR.overall : null;
+          return `
+            <div class="stat">
+              <div class="label">${escapeHtml(d)}</div>
+              <div style="display:flex;gap:14px;align-items:baseline">
+                <div><div style="font-size:11px;color:var(--text-muted)">DSR</div>
+                  <div class="value dsr" style="font-size:18px">${formatPct(dsr)}</div></div>
+                <div><div style="font-size:11px;color:var(--text-muted)">ASR</div>
+                  <div class="value asr" style="font-size:18px">${formatPct(asr)}</div></div>
+              </div>
+            </div>`;
+        })
+        .join("");
+
+      document.getElementById("app").innerHTML = `
+        <section class="panel">
+          <span class="card-tag" style="display:inline-block">Model</span>
+          <h3 style="margin-top:8px">${escapeHtml(m.name)}</h3>
+          <div class="meta">
+            <span class="pill">Scenario: <strong>${escapeHtml(s.name)}</strong></span>
+            <span class="pill">Agent: <strong>${escapeHtml(a.name)}</strong></span>
+          </div>
+          <div class="stat-row" style="margin-top:14px">
+            ${overallStats}
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>DSR by attack type — across defense methods</h3>
+          <p>How well each defense triggers refusal for each attack framing. Higher = better.</p>
+          <div class="chart-wrap tall"><canvas id="model-dsr-chart"></canvas></div>
+        </section>
+
+        <section class="panel">
+          <h3>ASR by attack type — across defense methods</h3>
+          <p>Fraction of malicious tasks the model still completes. Lower = better.</p>
+          <div class="chart-wrap tall"><canvas id="model-asr-chart"></canvas></div>
+        </section>
+      `;
+      drawModelChart(s, a, m, "DSR", "model-dsr-chart");
+      drawModelChart(s, a, m, "ASR", "model-asr-chart");
+    }
+
+    function renderNotFound(what) {
+      setBreadcrumb([{ label: "Home", path: "/" }]);
+      document.getElementById("app").innerHTML = `
+        <div class="empty-state">
+          <h2>Not found</h2>
+          <p>Could not resolve route: <code>${escapeHtml(what)}</code></p>
+          <p><a href="#/">← Back to home</a></p>
+        </div>
+      `;
+    }
+
+    // ---------- Charts ----------
+    // Defense-method palette — distinct hues so a single chart with multiple
+    // defenses stays readable.
+    const DEFENSE_COLORS = [
+      "rgba(120, 130, 145, 0.85)",   // clean — muted grey
+      "rgba(214, 130, 60, 0.85)",    // Prompt Injection — orange
+      "rgba(214, 195, 60, 0.85)",    // Warning Based — yellow
+      "rgba(74, 108, 247, 0.85)",    // AutoGuard — blue (primary)
+      "rgba(120, 80, 200, 0.85)",    // ablation 1 — purple
+      "rgba(60, 170, 170, 0.85)",    // ablation 2 — teal
+    ];
+    function colorForDefense(name, idx) {
+      const lc = (name || "").toLowerCase();
+      if (lc === "clean") return DEFENSE_COLORS[0];
+      if (lc.startsWith("prompt injection")) return DEFENSE_COLORS[1];
+      if (lc.startsWith("warning")) return DEFENSE_COLORS[2];
+      if (lc === "autoguard") return DEFENSE_COLORS[3];
+      return DEFENSE_COLORS[(idx + 4) % DEFENSE_COLORS.length];
+    }
+
+    function commonOpts(yLabel) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "top" },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.dataset.label}: ${formatPct(ctx.parsed.y)}`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: { display: true, text: yLabel || "Score (%)" },
+            ticks: { callback: (v) => v + "%" },
+          },
+        },
+      };
+    }
+
+    function pickResult(model, defense, metric) {
+      const r = (model.results || {})[defense];
+      if (!r || !r[metric]) return null;
+      return r[metric];
+    }
+
+    // Scenario page summary: per-agent average DSR & ASR (AutoGuard).
+    function drawScenarioAgentSummaryChart(scenario) {
+      const ctx = document.getElementById("scenario-summary-chart");
+      if (!ctx) return;
+
+      const labels = scenario.agents.map((a) => a.name);
+      const meanDsr = scenario.agents.map((a) => agentMean(a, "AutoGuard", "DSR"));
+      const meanAsr = scenario.agents.map((a) => agentMean(a, "AutoGuard", "ASR"));
+
+      trackChart(
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Mean DSR ↑",
+                data: meanDsr,
+                backgroundColor: "rgba(45, 138, 85, 0.85)",
+                borderColor: "rgba(45, 138, 85, 1)",
+                borderWidth: 1,
+              },
+              {
+                label: "Mean ASR ↓",
+                data: meanAsr,
+                backgroundColor: "rgba(214, 67, 90, 0.85)",
+                borderColor: "rgba(214, 67, 90, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: commonOpts("Score (%)"),
+        })
+      );
+    }
+
+    function agentMean(agent, defense, metric) {
+      const vals = (agent.models || [])
+        .map((m) => {
+          const r = pickResult(m, defense, metric);
+          return r && r.overall != null ? toNum(r.overall) : null;
+        })
+        .filter((v) => v !== null);
+      if (!vals.length) return null;
+      return vals.reduce((a, b) => a + b, 0) / vals.length;
+    }
+
+    // Agent page: x = models, grouped bars per defense method (single metric).
+    function drawAgentChart(scenario, agent, metric) {
+      const ctx = document.getElementById("agent-chart");
+      if (!ctx) return;
+      const defenses = agent.defense_methods || [];
+      const labels = agent.models.map((m) => m.name);
+
+      const datasets = defenses.map((d, i) => ({
+        label: d,
+        data: agent.models.map((m) => {
+          const r = pickResult(m, d, metric);
+          return r ? toNum(r.overall) : null;
+        }),
+        backgroundColor: colorForDefense(d, i),
+        borderWidth: 1,
+      }));
+
+      trackChart(
+        new Chart(ctx, {
+          type: "bar",
+          data: { labels: labels, datasets: datasets },
+          options: commonOpts(metric + " (%)"),
+        })
+      );
+    }
+
+    // Model page: x = attack types, grouped bars per defense method, fixed metric.
+    function drawModelChart(scenario, agent, model, metric, canvasId) {
+      const ctx = document.getElementById(canvasId);
+      if (!ctx) return;
+      const types = scenario.attack_types || [];
+      const defenses = agent.defense_methods || [];
+
+      const datasets = defenses.map((d, i) => ({
+        label: d,
+        data: types.map((t) => {
+          const r = pickResult(model, d, metric);
+          if (!r || !r.by_attack_type) return null;
+          return toNum(r.by_attack_type[t]);
+        }),
+        backgroundColor: colorForDefense(d, i),
+        borderWidth: 1,
+      }));
+
+      trackChart(
+        new Chart(ctx, {
+          type: "bar",
+          data: { labels: types, datasets: datasets },
+          options: commonOpts(metric + " (%)"),
+        })
+      );
+    }
+
+    // ---------- Utilities ----------
+    function toNum(v) {
+      if (v === null || v === undefined || v === "") return 0;
+      const n = Number(v);
+      if (isNaN(n)) return 0;
+      // Values are pre-normalized to 0–100 by build_data.py — do NOT renormalize.
+      // (Doing so misreads e.g. 1.0 = "1 percent" as a fraction → 100%.)
+      return n;
+    }
+    function formatPct(v) {
+      if (v === null || v === undefined || v === "") return "—";
+      const n = toNum(v);
+      return n.toFixed(1) + "%";
+    }
+    function bindCardNavs() {
+      document.querySelectorAll("[data-nav]").forEach((el) => {
+        el.addEventListener("click", () => navigate(el.getAttribute("data-nav")));
+      });
+    }
+    function bindRowNavs() {
+      document.querySelectorAll("tr.clickable[data-nav]").forEach((el) => {
+        el.addEventListener("click", () => navigate(el.getAttribute("data-nav")));
+      });
+    }
+
+    // ---------- Boot ----------
+    (async () => {
+      await loadData();
+      if (LOAD_ERROR) {
+        renderLoadError();
+        return;
+      }
+      if (!window.location.hash) window.location.hash = "#/";
+      dispatch();
+    })();
+  </script>
+</body>
+</html>

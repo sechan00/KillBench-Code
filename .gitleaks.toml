@@ -1,0 +1,38 @@
+# Narrow exceptions for fictional fixtures and local-only example strings.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Fictional fixture / local-only example: data/prompts/pii.txt"
+condition = "AND"
+regexTarget = "secret"
+paths = ["(?:^|/)(?:data/prompts/pii\\.txt|redteaming_test(?:_grok|_gpt5)?\\.py)$"]
+regexes = ["^ed25519\\-signature\\-of\\-nonce\\-LDP\\-v1$"]
+
+[[allowlists]]
+description = "Fictional fixture / local-only example: data/website/webhack/index.html"
+condition = "AND"
+regexTarget = "secret"
+paths = ["(?:^|/)data/website/webhack/index\\.html$"]
+regexes = ["^sk\\-1234567890abcdef$"]
+
+[[allowlists]]
+description = "Fictional fixture / local-only example: data/website/webhack/index.html"
+condition = "AND"
+regexTarget = "secret"
+paths = ["(?:^|/)data/website/webhack/index\\.html$"]
+regexes = ["^pg_live_abc123def456$"]
+
+[[allowlists]]
+description = "Fictional fixture / local-only example: scripts/run_qwen35_4gpu_cluster.sh"
+condition = "AND"
+regexTarget = "secret"
+paths = ["(?:^|/)scripts/run_qwen35_4gpu_cluster\\.sh$"]
+regexes = ["^local\\-uncensored$"]
+
+[[allowlists]]
+description = "Fictional fixture / local-only example: scripts/run_qwen35_uncensored_server.sh"
+condition = "AND"
+regexTarget = "secret"
+paths = ["(?:^|/)scripts/run_qwen35_uncensored_server\\.sh$"]
+regexes = ["^qwen3\\.5\\-35b\\-uncensored$"]
